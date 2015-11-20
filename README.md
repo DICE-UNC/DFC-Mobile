@@ -1,32 +1,32 @@
 Startup Guide
 ====
 
-This app was developed using Onsen UI, Cordova, & Node.js.
+This app was developed using Cordova, & Node.js.
 
-## Requirement
 
  * Node.js  - [Install Node.js](http://nodejs.org)
  * Cordova  - Install by `npm install cordova`
- * Onsen UI - Install by `$ bower install onsenui`
 
 
 ### Directory Layout
 
-    README.md     --> This file
-    gulpfile.js   --> Gulp tasks definition
-    www/          --> Asset files for app
-      index.html  --> App entry point (login page)
-      app.html    --> Main App
-      img/        --> Images and Icons Used 
-      js/
-      styles/
-      lib/onsen/
-        stylus/   --> Stylus files for onsen-css-components.css
-        js/       --> JS files for Onsen UI
-        css/      --> CSS files for Onsen UI
-    platforms/    --> Cordova platform directory
-    plugins/      --> Cordova plugin directory
-    merges/       --> Cordova merge directory
-    hooks/        --> Cordova hook directory
+    bower_components -------------------------------> angular and bower components
+    platforms --------------------------------------> platforms for cordova
+          android ----------------------------------> information and APK for andorid app
+          ios --------------------------------------> information for iOS app
+    plugins ----------------------------------------> cordova plugins
+    www --------------------------------------------> main app code
+         index.html --------------------------------> main app page
+         components --------------------------------> angular components
+         js ----------------------------------------> main JavaScrip files
+         styles ------------------------------------> main CSS files
+         login -------------------------------------> HTML and JS for login page 
+         notification ------------------------------> HTML and JS for notifications
+         home --------------------------------------> HTML and JS for home page
+         upload ------------------------------------> HTML and JS for upload action
+         profile -----------------------------------> HTML and JS for profile view
+         subcol ------------------------------------> HTML and JS for subcollection view
+         icons -------------------------------------> Icons used in app
+         
 
 
