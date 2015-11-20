@@ -1,5 +1,5 @@
 
-<!--  
+
   <style>
 .login-form {
 	text-align: center;
@@ -11,30 +11,22 @@ input[type=text], input[type=password] {
 	width: 100%;
 	margin: 0 auto;
 	outline: none;
-	padding-top: 24px;
-	padding-bottom: 24px;
+	padding-top: 15px;
+	padding-bottom: 15px;
+	border: none;
+	border-bottom: solid 1px #8a8a8a;
 }
 
 .login-button {
 	width: 100%;
 	margin: 0 auto;
-	background: #F05022;
-}
-		
-.forgot-password {
-	display: block;
-	margin: 8px auto 0 auto;
-	font-size: 14px;
-	color:#F05022;
 }
 
 select {
 	background: transparent;
    	width: 100%;
-	border: 2 #DDDDDD;
-	border-color: #DDDDDD;
 	color:#000;
-	border-radius:3;
+	border-radius:2px;
    	padding: 10px;
 	font-size: 16px;
 	line-height: 1;
@@ -43,8 +35,10 @@ select {
 	margin-bottom:10px;
 	margin-top:10px;
 }
+
+
   </style>
--->
+
 
 	  <div class="login-form" align="center" ng-controller="loginCtrl">
         <ons-page>
@@ -67,6 +61,7 @@ select {
                 <option>PAM</option>
             </select>
             <br>
+			<br>
             <button modifier="large" class="login-button" ng-click="submitLogin()" prevent-default>Log In</button>
         </ons-page>
         
