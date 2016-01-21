@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('home', ['ngRoute'])
+angular.module('home', ['ngRoute', 'ngFileUpload', 'ngCordova'])
 
     .config(['$routeProvider', function ($routeProvider) {
         $routeProvider.when('/home', {
@@ -49,7 +49,7 @@ angular.module('home', ['ngRoute'])
 
 
 
-    .controller('homeCtrl', ['$scope',  '$log', '$http', '$location', 'globals', 'virtualCollectionsService', function ($scope, $log, $http, $location, $globals, $virtualCollectionsService) {
+    .controller('homeCtrl', ['$scope',  '$log', 'Upload', '$http', '$location', 'globals', 'virtualCollectionsService', 'breadcrumbsService','$cordovaFileTransfer', function ($scope, $log, Upload, $http, $location, $globals, $virtualCollectionsService, breadcrumbsService, $cordovaFileTransfer) {
 
 
 
@@ -58,24 +58,62 @@ angular.module('home', ['ngRoute'])
             $log.info("getting starred collection");
 
             return $http({method: 'GET', url: $globals.backendUrl('collection/Starred%20Files?offset=0&path=')}).success(function (data) {
-                $scope.collectionListing = data;
+                $scope.collectionListingDropdown = data;
             }).error(function () {
-                $scope.collectionListing = [];
+                $scope.collectionListingDropdown = [];
             });
         };
 
-        $scope.appTitle = function(title){
-            $log.info("New title should be " + title);
-            var url = $location.url();
-            url = url.substring(0,5);
-            if(url == '/logi'){
-                return "Mobile App"
-            }else if(url == '/home'){
-                return "Starred Collection"
-            }else{
-                return title;
+        $scope.getBreadcrumbPaths = function () {
+
+            breadcrumbsService.setCurrentAbsolutePath($scope.pagingAwareCollectionListing.pagingAwareCollectionListingDescriptor.parentAbsolutePath);
+            $scope.breadcrumb_full_array = breadcrumbsService.getWholePathComponents();
+            $scope.breadcrumb_full_array_paths = [];
+            var totalPath = "";
+            for (var i = 0; i < $scope.breadcrumb_full_array.length; i++) {
+                totalPath = totalPath + "/" + $scope.breadcrumb_full_array[i];
+                $scope.breadcrumb_full_array_paths.push({b: $scope.breadcrumb_full_array[i], path: totalPath});
             }
+            if ($scope.breadcrumb_full_array_paths.length > 5) {
+                $scope.breadcrumb_compressed_array = $scope.breadcrumb_full_array_paths.splice(0, ($scope.breadcrumb_full_array_paths.length) - 5);
+            }
+        };
+        // var download_path
+        if ($scope.pagingAwareCollectionListing && $scope.pagingAwareCollectionListing.pagingAwareCollectionListingDescriptor.pathComponents) {
+
+            $scope.current_collection_index = $scope.pagingAwareCollectionListing.pagingAwareCollectionListingDescriptor.pathComponents.length - 1;
         }
+
+        /**
+         * Upon the selection of an element in a breadrumb link, set that as the location of the browser, triggering
+         * a view of that collection
+         * @param index
+         */
+        $scope.goToBreadcrumb = function (path) {
+
+            if (!path) {
+                $log.error("cannot go to breadcrumb, no path");
+                return;
+            }
+            $location.path("/home/root");
+            $location.search("path", path);
+
+        };
+        $scope.delete_action = function (){
+            var delete_paths = $scope.dataProfile.parentPath + "/" +$scope.dataProfile.childName;
+            $log.info('Deleting:'+delete_paths);
+            return $http({
+                method: 'DELETE',
+                url: $globals.backendUrl('file'),
+                params: {
+                    path : delete_paths
+                }
+            }).then(function (data) {
+                MessageService.info("Deletion completed!");
+                window.history.back();
+            })
+        };
+
 
         $scope.goSubCollection = function(vcName, path) {
 
@@ -123,7 +161,17 @@ angular.module('home', ['ngRoute'])
             }else{
                 return false;
             }
-        }
+        };
+
+        $scope.shouldHideUpload = function(){
+            var url = $location.url();
+            url = url.substr(0,5);
+            if( url == '/home' || url == '/prof'){
+                return true;
+            }else{
+                return false;
+            }
+        };
 
         $scope.selectProfile = function (irodsAbsolutePath) {
             $log.info("going to Data Profile");
@@ -140,9 +188,42 @@ angular.module('home', ['ngRoute'])
 
         //File Actions
         $scope.getDownloadLink = function() {
-            return  $globals.backendUrl('download') + "?path=" + $scope.dataProfile.domainObject.absolutePath;
+
+            var url = $globals.backendUrl('download') + "?path=" + $scope.dataProfile.parentPath + "/" + $scope.dataProfile.childName;
+            $log.info("Download URL is: " + url);
+
+            return url;
 
         };
+
+
+        $scope.downloadFile = function(url, fileName, folder){
+
+            url = $globals.backendUrl('download') + "?path=" + $scope.dataProfile.parentPath + "/" + $scope.dataProfile.childName;
+
+            url = encodeURI(url);
+            console.log("Download url is " + url);
+
+            var filePath = folder + $scope.dataProfile.childName;
+
+            filePath = encodeURI(filePath);
+
+            console.log("*****filepath is saved at "+filePath);
+
+            $cordovaFileTransfer.download(
+                    url,
+                    filePath,
+                    function(entry){
+                        console.log('Worked!!!',filePath);
+                    },
+                    function(error){
+                        console.log('failed, something went wrong :(');
+                    }
+            );
+        }
+
+
+
 
         $scope.delete_pop_up_open = function(){
             $('.renamer').fadeOut(100);
@@ -159,15 +240,24 @@ angular.module('home', ['ngRoute'])
 
         $scope.delete_action = function (){
             var delete_paths = 'path='+ $scope.dataProfile.parentPath + "/" +$scope.dataProfile.childName;
-            $log.info('Deleting:'+delete_paths);
+
+            //delete_paths = delete_paths.substring(0, delete_paths.length - 1);
+            $log.info('Deleting:' + delete_paths);
             return $http({
                 method: 'DELETE',
-                url: $globals.backendUrl('file') + '?' + delete_paths
-            }).success(function (data) {
-                alert('Deletion completed');
-                window.history.go(-1);
+                url: $globals.backendUrl('file'),
+                params: {
+                    path: delete_paths
+                }
+            }).then(function (data) {
+                return $collectionsService.listCollectionContents($scope.selectedVc.data.uniqueName, $scope.pagingAwareCollectionListing.pagingAwareCollectionListingDescriptor.parentAbsolutePath, 0);
+            }).then(function (data) {
+                MessageService.info("Deletion completed!");
+                $scope.pagingAwareCollectionListing = data;
+                $scope.pop_up_close_clear();
             })
         };
+
 
         $scope.rename_pop_up_open = function() {
             $('.deleter').fadeOut(100);
@@ -196,6 +286,67 @@ angular.module('home', ['ngRoute'])
             })
 
         };
+
+
+       // <!---------------------------------------------------->
+
+        $scope.$watch('files', function () {
+            $scope.upload($scope.files);
+        });
+
+        $scope.multiple = true;
+        $scope.files_to_upload = [];
+        $scope.files_name = [];
+        $scope.copy_source = "";
+        $scope.copy_target = "";
+        $scope.upload_pop_up_open = function () {
+            $('.pop_up_window').fadeIn(100);
+            $('.uploader').fadeIn(100);
+        };
+
+        $scope.stage_files = function (files) {
+            if (files && files.length) {
+                $(".upload_container_result").css('display', 'block');
+
+                for (var i = 0; i < files.length; i++) {
+                    var file = files[i];
+                    var pre_existing = $.inArray(file.name, $scope.files_name);
+                    if (pre_existing === 0) {
+                        MessageService.danger('There is already a file named "' + file.name + '" on your list');
+                    } else {
+                        $scope.files_to_upload.push(file);
+                        $scope.files_name.push(file.name);
+                        $(".upload_container_result ul").append('<li id="uploading_item_' + i + '" class="light_back_option_even"><div class="col-xs-10 list_content"><img src="icons/data_object_icon.png">' + file.name + '</div></li>');
+                    }
+                }
+            }
+
+        }
+
+        $scope.upload = function () {
+
+            if ($scope.files_to_upload && $scope.files_to_upload.length) {
+                for (var i = 0; i < $scope.files_to_upload.length; i++) {
+                    var file = $scope.files_to_upload[i];
+                    Upload.upload({
+                        url: $globals.backendUrl('file'),
+                        fields: {collectionParentName: '/tempZone/home/danb/cesar/'},
+                        file: file
+                    }).progress(function (evt) {
+                        var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
+                        $log.info(progressPercentage);
+
+                    }).then(function (data) {
+                        $scope.pagingAwareCollectionListing = data;
+                        $scope.pop_up_close();
+                        $scope.files_to_upload = [];
+                        $scope.files_name = [];
+                        $log.info("File Uploaded");
+                    });
+                }
+            }
+        };
+
 
 
 
@@ -238,6 +389,7 @@ angular.module('home', ['ngRoute'])
             }
 
         };
+
 
 
     }])

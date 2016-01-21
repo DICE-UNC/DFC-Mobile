@@ -157,13 +157,18 @@
 }
 
 .pop_up_window{
-	position:absolute;
 	margin: 0 auto;
-	width: 100%;
-	min-height: 100vh;
+	width: 90%;
+	align-self: center;
+	align-content: center;
+	text-align: center;
 	display: none;
-	background: rgba(0,0,0,0.8);
+	box-shadow: 5px 5px 5px #888888;
+	background-color: #e6e6e6;
 	z-index: 14;
+	padding: 10px;
+	position: absolute;
+	top: 100px;
 }
 
 .profileImg{
@@ -221,5 +226,15 @@
 	padding-top: 6px;
 	padding-bottom: 6px;
 	border-bottom: thin;
+}
+
+.dropdown-menu-item{
+	font-size: large;
+	text-decoration: none;
+	padding: 10px;
+}
+
+.dropdown-menu-item-anchor{
+	text-decoration:none;
 }
 

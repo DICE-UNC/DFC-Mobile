@@ -80,8 +80,10 @@
 }
 
 .search_box{
+	margin-top: 40px;
 	width:100%;
 	radius:10%;
+
 	/*border: #777;*/
 }
 
@@ -157,13 +159,18 @@
 }
 
 .pop_up_window{
-	position:absolute;
 	margin: 0 auto;
-	width: 100%;
-	min-height: 100vh;
+	width: 90%;
+	align-self: center;
+	align-content: center;
+	text-align: center;
 	display: none;
-	background: rgba(0,0,0,0.8);
+	box-shadow: 5px 5px 5px #888888;
+	background-color: #e6e6e6;
 	z-index: 14;
+	padding: 10px;
+	position: absolute;
+	top: 100px;
 }
 
 .profileImg{
@@ -172,21 +179,23 @@
 }
 
 .profileList{
-	float: right;
+	/*float: right;*/
+	padding-left:70px;
 }
 
 .profileListBut{
-	list-style-type: none;
-	padding-top:270px;
-	display: inline;
-	margin: 0 auto;
-	position:fixed;
+	position: fixed;
+	bottom: 0;
+	width: 100%;
+	background-color: #2196F3;
+
 	text-align: center;
-	padding-left:90px;
+	/*padding-left:90px;*/
 }
 
 .profileBut{
 	display:inline;
+	border: solid black;
 }
 
 .profileImg{
@@ -197,7 +206,7 @@
 }
 
 .profileDets{
-	position: fixed;
+	/*position: fixed;*/
 	float: top;
 	margin: 0 auto;
 }
@@ -221,5 +230,23 @@
 	padding-top: 6px;
 	padding-bottom: 6px;
 	border-bottom: thin;
+}
+
+.dropdown-menu-item{
+	font-size: large;
+	text-decoration: none;
+	padding: 10px;
+}
+
+.dropdown-menu-item-anchor{
+	text-decoration:none;
+}
+
+.filePreview{
+	padding-top: 40px;
+	width: 70%;
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
 }
 
