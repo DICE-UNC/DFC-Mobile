@@ -1,5 +1,5 @@
 Cloud Browser Mobile Guide
-====
+======================================
 
 Developed by Matthew Krause/DICE-UNC. 2016.
 This app was developed using Onsen UI, Cordova, & Node.js.
@@ -10,7 +10,6 @@ The Cloud Browser Mobile is a lightweight, mobile version of the DFC iRODS Cloud
 
 Use the Cloud Browser Mobile to access your iRODS data grid from your mobile device, to quickly upload data objects on the go, and access/add metadata.
 
-======================================
 Apple and Android App Store Locations
 ======================================
 Apple iOS App Store:
