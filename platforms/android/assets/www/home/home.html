@@ -1,17 +1,10 @@
 <div>
 
-    <div style="position: fixed;left: 50%;transform: translate(-50%, -120%);" ng-controller="subColCtrl">
-
-        <!--<button class="mui-btn" data-mui-style="raised" data-mui-color="primary">-->
-            <!--<img src="icons/search.png" style="width: 15px; height: 15px;;">-->
-        <!--</button>-->
-
+    <div style="position: fixed; z-index:99; left: 50%;transform: translate(-50%, -120%);" ng-controller="subColCtrl">
         <button class="mui-btn mui-btn--flat mui-btn--primary" data-mui-color="primary"
-                ng-click="selectProfile(collectionListingInSubcol.pagingAwareCollectionListingDescriptor.parentAbsolutePath)"
-                style="transform: translate(0,-50px)">
+                ng-click="selectProfile(collectionListingInSubcol.pagingAwareCollectionListingDescriptor.parentAbsolutePath)">
             Starred Collection
         </button>
-
     </div>
 
     <div style="transform: translateY(-30px);">
@@ -55,37 +48,9 @@
     </table>
     </div>
 
-
-
-
-
-
-    <div class="pop_up_window" ng-controller="subColCtrl">
-        <div class="upload_container">
-            Choose the files you wish to upload to <b>this</b> collection.
-            <div class="btn btn-default btn-xs" ngf-select ngf-change="stage_files($files)" ngf-multiple="multiple">Browse Files</div>
-        </div>
-
-        <!--<div class="three_column centered">-->
-            <!--<div class="column_content uploader pop_up_content">-->
-                <!--<div class="upload_container">-->
-                    <!--<br>-->
-                    <!--Choose the file(s) you wish to upload to <b>THIS</b> collection.<br>-->
-                <!--</div>-->
-                <div class="upload_container_result">
-
-                    <div class="container"><hr class="hr_flat"></div>
-                    <div class="right container t_right">
-                        <div class="btn btn-success" ng-click="upload($files)">Done</div>
-                        <div class="btn btn-default" ng-click="pop_up_close()">Cancel</div>
-                    </div>
-
-                </div>
-            <!--</div>-->
-        <!--</div>-->
+    <div class="subColFooter" ng-click="show50More()">
+        Showing {{collectionListingDropdown.collectionAndDataObjectListingEntries.length}} starred entries across entire library
     </div>
-
-
 
 
 </div>

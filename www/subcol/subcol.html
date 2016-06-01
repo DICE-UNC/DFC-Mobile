@@ -1,20 +1,20 @@
 
-<div>
+<div ng-controller="subColCtrl">
 
 
-    <div style="position:fixed; left: 50%;transform: translate(-50%, -110%);" ng-controller="subColCtrl">
+    <div class="subColContainer" style="position:absolute;">
 
 
         <button class="mui-btn" data-mui-color="primary"
                 ng-click="selectProfile(collectionListingInSubcol.pagingAwareCollectionListingDescriptor.parentAbsolutePath)"
-                style="position:relative; transform: translate(-50%); z-index: 9;">
-            <!--  style="position:fixed; left: 50%; transform: translate(-50%,-110px) -->
+                style="position:fixed; left:50%; transform: translate(-50%,-55px); z-index:8;">
+            <!--  style="position:fixed; left: 50%; transform: translate(250px,-50px) -->
             {{collectionListingInSubcol.pagingAwareCollectionListingDescriptor.pathComponents[collectionListingInSubcol.pagingAwareCollectionListingDescriptor.pathComponents.length - 1]}}
         </button>
 
     </div>
 
-    <div style="transform: translateY(-30px);">
+    <div class="subColContainer" style="transform: translateY(-30px);">
         <input type="text" id="searchTerm" placeholder="Search the {{collectionListingInSubcol.pagingAwareCollectionListingDescriptor.pathComponents[collectionListingInSubcol.pagingAwareCollectionListingDescriptor.pathComponents.length - 1]}} collection"
                class="search_box" onkeyup="doSearch()" />
 
@@ -23,11 +23,14 @@
                 <th ng-hide="true==true">Hidden</th>
             </thead>
 
-            <tbody ng-controller="subColCtrl">
-            <tr ng-repeat="name in collectionListingInSubcol.collectionAndDataObjectListingEntries">
+            <tbody>
+
+            <tr ng-repeat="name in collectionListingInSubcol.collectionAndDataObjectListingEntries|limitTo: elmsDisplayed">
+
                 <!-- Data Objects -->
                 <td class="sd" ng-show="{{name.dataObject}} == true" ng-click="selectProfile(name.formattedAbsolutePath)">
                     <div style="overflow-x:hidden;">
+
                         <img ng-show="{{name.dataObject}} == true" src="icons/data_object_icon.png">
                         <span class="data_object" ng-show="{{name.dataObject}} == true" ng-click="selectProfile(name.formattedAbsolutePath)">
                             <button class="mui-btn" data-mui-style="flat" data-mui-color="primary">{{name.nodeLabelDisplayValue | limitTo: 25}}</button>
@@ -52,27 +55,44 @@
                     </div>
                 </td>
             </tr>
+
+
             </tbody>
+
+
+
+
         </table>
     </div>
 
+    <div class="subColFooter" ng-click="show25More()">
+        Showing {{numElmsinSubCol()}} of {{collectionListingInSubcol.collectionAndDataObjectListingEntries.length}} entries.
+        <div ng-show="shouldOfferMore()">Click to show 25 more.</div>
+    </div>
 
-    <div class="pop_up_window" ng-controller="subColCtrl">
+    <div class="pop_up_window_upload">
         <div class="upload_container">
-            Choose the files you wish to upload to <b>this</b> collection.
+            <p class="upload_txt">Choose the files you wish to upload to <b>this</b> collection.</p>
             <div class="btn btn-default btn-xs" ngf-select ngf-change="stage_files($files)" ngf-multiple="multiple">Browse Files</div>
+            <p class="fileToUpld">{{files_name[0]}}</p>
         </div>
 
         <div class="upload_container_result">
-
-            <div class="container"><hr class="hr_flat"></div>
-            <div class="right container t_right">
-                <div class="btn btn-success" ng-click="upload($files)">Done</div>
-                <div class="btn btn-default" ng-click="pop_up_close()">Cancel</div>
-            </div>
+                <!--<div class="btn btn-success" ng-click="upload($files)">Done</div>-->
+                <a class="upload_button_cancel" ng-click="pop_up_close()">Cancel</a>
+                <a class="upload_button_ok" ng-click="upload($files)">Upload</a>
 
         </div>
     </div>
+
+    <div class="upload_button_cntr" id="uploadPlus" ng-click="upload_pop_up_open()">
+        <button class="mui-btn mui-btn--fab mui-btn--primary subcol_upload_button" style="">
+            +
+        </button>
+    </div>
+
+
+
 
 
 </div>

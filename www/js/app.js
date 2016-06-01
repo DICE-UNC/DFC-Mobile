@@ -13,6 +13,8 @@ angular.module('myApp', [
     'globalsModule',
     'httpInterceptorModule',
     'fileModule',
+    'myApp.metadata',
+    //'fileService',
     'ngCordova',
 ])
     .config(['$routeProvider', function ($routeProvider) {
@@ -198,6 +200,9 @@ angular.module('globalsModule', [])
     });
 
 
+
+
+
 angular.module('fileModule',[])
     .factory('fileService', ['$http', '$log', '$q','globals',function ($http, $log, $q, globals) {
 
@@ -370,3 +375,4 @@ angular.module('fileModule',[])
         };
 
     }]);
+'use strict';

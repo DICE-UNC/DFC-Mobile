@@ -49,9 +49,13 @@ angular.module('home', ['ngRoute', 'ngFileUpload', 'ngCordova'])
 
 
 
-    .controller('homeCtrl', ['$scope',  '$log', 'Upload', '$http', '$location', 'globals', 'virtualCollectionsService', 'breadcrumbsService','$cordovaFileTransfer', function ($scope, $log, Upload, $http, $location, $globals, $virtualCollectionsService, breadcrumbsService, $cordovaFileTransfer) {
+    .controller('homeCtrl', ['$scope',  '$log', 'Upload', '$http', '$location', 'fileService', 'MessageService', 'globals', 'virtualCollectionsService', 'breadcrumbsService','$cordovaFileTransfer', '$window', 'collectionsService', 'metadataService', function ($scope, $log, Upload, $http, $location, MessageService, fileService, $globals, $virtualCollectionsService, breadcrumbsService, $cordovaFileTransfer, $window, $collectionsService, Camera, metadataService) {
 
 
+        $scope.refresh = function(){
+            $log.info("refreshing view");
+            location.reload();
+        }
 
         $scope.listVirtualCollections = function (irods) {
 
@@ -90,7 +94,6 @@ angular.module('home', ['ngRoute', 'ngFileUpload', 'ngCordova'])
          * @param index
          */
         $scope.goToBreadcrumb = function (path) {
-
             if (!path) {
                 $log.error("cannot go to breadcrumb, no path");
                 return;
@@ -100,7 +103,7 @@ angular.module('home', ['ngRoute', 'ngFileUpload', 'ngCordova'])
 
         };
         $scope.delete_action = function (){
-            var delete_paths = $scope.dataProfile.parentPath + "/" +$scope.dataProfile.childName;
+            var delete_paths = $scope.dataProfile.domainObject.absolutePath;
             $log.info('Deleting:'+delete_paths);
             return $http({
                 method: 'DELETE',
@@ -109,7 +112,10 @@ angular.module('home', ['ngRoute', 'ngFileUpload', 'ngCordova'])
                     path : delete_paths
                 }
             }).then(function (data) {
-                MessageService.info("Deletion completed!");
+                $('.profileDets').css('-webkit-filter', 'blur(0px)')
+                $('.mui-appbar').css('-webkit-filter', 'blur(0px)')
+                $('.profileListDiv').css('-webkit-filter', 'blur(0px)')
+                $('.filePreview').css('-webkit-filter', 'blur(0px)')
                 window.history.back();
             })
         };
@@ -129,6 +135,10 @@ angular.module('home', ['ngRoute', 'ngFileUpload', 'ngCordova'])
 
         $scope.goHome = function(){
             $location.path('/home/');
+            $('.subColContainer').css('-webkit-filter', 'blur(0px)');
+            $('.subColFooter').css('-webkit-filter', 'blur(0px)');
+            $('.upload_button_cntr').css('-webkit-filter', 'blur(0px)');
+            $('.mui-appbar').css('-webkit-filter', 'blur(0px)');
         }
 
         $scope.goLog = function(){
@@ -163,6 +173,25 @@ angular.module('home', ['ngRoute', 'ngFileUpload', 'ngCordova'])
             }
         };
 
+        $scope.shouldShowImg = function(){
+            var mimeType = $scope.dataProfile.mimeType;
+            mimeType = mimeType.substr(0,5);
+            if(mimeType == "image"){
+                return true;
+            }else{
+                return false;
+            }
+        }
+
+        $scope.shouldShowTxt = function(){
+            var mimeType = $scope.dataProfile.mimeType;
+            if(mimeType == "text/plain"){
+                return true;
+            }else{
+                return false;
+            }
+        }
+
         $scope.shouldHideUpload = function(){
             var url = $location.url();
             url = url.substr(0,5);
@@ -172,6 +201,34 @@ angular.module('home', ['ngRoute', 'ngFileUpload', 'ngCordova'])
                 return false;
             }
         };
+
+        $scope.shouldHideProf = function(){
+            var url = $location.url();
+            url = url.substr(0,5);
+            if(url == '/prof') {
+                return false;
+            }else{
+                return true;
+            }
+        }
+
+        $scope.showingPrevew;
+
+        $scope.showPreview = function(){
+            $log.info("button worked");
+            if($scope.showingPrevew){
+                $('.filePreview').css('display','none');
+                $('.upArrowButton').css('display','none');
+                $('.downArrowButton').css('display','inline-block');
+                $scope.showingPrevew = false;
+            }else{
+                $scope.showingPrevew = true;
+                $('.filePreview').css('display', 'block');
+                $('.downArrowButton').css('display','none');
+                $('.upArrowButton').css('display','inline-block');
+            }
+        }
+
 
         $scope.selectProfile = function (irodsAbsolutePath) {
             $log.info("going to Data Profile");
@@ -187,10 +244,14 @@ angular.module('home', ['ngRoute', 'ngFileUpload', 'ngCordova'])
         }
 
         //File Actions
+        $scope.downloadURL;
         $scope.getDownloadLink = function() {
 
             var url = $globals.backendUrl('download') + "?path=" + $scope.dataProfile.parentPath + "/" + $scope.dataProfile.childName;
+            $log.info("Data Profile -----")
+            $log.info($scope.dataProfile);
             $log.info("Download URL is: " + url);
+            $scope.downloadURL = url;
 
             return url;
 
@@ -226,70 +287,53 @@ angular.module('home', ['ngRoute', 'ngFileUpload', 'ngCordova'])
                 }
             );
 
-
-            //$cordovaFileTransfer.download(url, filePath, {}, true).then(function (result) {
-            //    console.log('Success :)');
-            //}, function (error) {
-            //    console.log('Error :(');
-            //}, function (progress) {
-            //    // PROGRESS HANDLING GOES HERE
-            //});
-
-            //$cordovaFileTransfer.download(
-            //        url,
-            //        filePath,
-            //        function(entry){
-            //            console.log('Worked!!!',filePath);
-            //        },
-            //        function(error){
-            //            console.log('failed, something went wrong :(');
-            //        }
-            //);
-        }
-
-
+        };
 
 
         $scope.delete_pop_up_open = function(){
             $('.renamer').fadeOut(100);
-            $('.pop_up_window').fadeIn(100);
-            $(".delete_container ul").append('<li class="light_back_option_even"><div class="col-xs-7 list_content"><img src="home/img/Icons/data_object_icon.png">'+$scope.dataProfile.childName+'</div></li>');
+            $('.pop_up_window_rename').fadeOut(100);
+            $('.pop_up_window_delete').fadeIn(100);
+            //$(".delete_container ul").append('<li class="light_back_option_even"><div class="col-xs-7 list_content"><img src="home/img/Icons/data_object_icon.png">'+$scope.dataProfile.childName+'</div></li>');
             $('.deleter').fadeIn(100);
+            $('.profileDets').css('-webkit-filter', 'blur(20px)');
+            $('.mui-appbar').css('-webkit-filter', 'blur(20px)');
+            $('.profileListDiv').css('-webkit-filter', 'blur(20px)');
+            $('.filePreview').css('-webkit-filter', 'blur(20px)');
+            $('.imgPreview').css('-webkit-filter', 'blur(20px)');
+            $('.metaData').css('-webkit-filter','blur(20px)');
+
+
         };
 
         $scope.pop_up_close = function () {
-            $('.pop_up_window').fadeOut(100);
+            $('.pop_up_window_delete').fadeOut(100);
+            $('.pop_up_window_rename').fadeOut(100);
             $('.deleter').fadeOut(100);
             $('.renamer').fadeOut(100);
+            $('.profileDets').css('-webkit-filter', 'blur(0px)');
+            $('.mui-appbar').css('-webkit-filter', 'blur(0px)');
+            $('.profileListDiv').css('-webkit-filter', 'blur(0px)');
+            $('.filePreview').css('-webkit-filter', 'blur(0px)');
+            $('.imgPreview').css('-webkit-filter', 'blur(0px)');
+            $('.metaData').css('-webkit-filter','blur(0px)');
+
         };
-
-        $scope.delete_action = function (){
-            var delete_paths = 'path='+ $scope.dataProfile.parentPath + "/" +$scope.dataProfile.childName;
-
-            //delete_paths = delete_paths.substring(0, delete_paths.length - 1);
-            $log.info('Deleting:' + delete_paths);
-            return $http({
-                method: 'DELETE',
-                url: $globals.backendUrl('file'),
-                params: {
-                    path: delete_paths
-                }
-            }).then(function (data) {
-                return $collectionsService.listCollectionContents($scope.selectedVc.data.uniqueName, $scope.pagingAwareCollectionListing.pagingAwareCollectionListingDescriptor.parentAbsolutePath, 0);
-            }).then(function (data) {
-                MessageService.info("Deletion completed!");
-                $scope.pagingAwareCollectionListing = data;
-                $scope.pop_up_close_clear();
-            })
-        };
-
 
         $scope.rename_pop_up_open = function() {
             $('.deleter').fadeOut(100);
-            $('.pop_up_window').fadeIn(100);
+            $('.pop_up_window_delete').fadeOut(100);
+            $('.pop_up_window_rename').fadeIn(100);
             $('.renamer').fadeIn(100);
             var name_of_selection = $('.ui-selected').children('.list_content').children('.data_object').text();
             $('.selected_object').append(name_of_selection);
+            $('.profileDets').css('-webkit-filter', 'blur(20px)');
+            $('.mui-appbar').css('-webkit-filter', 'blur(20px)');
+            $('.profileListDiv').css('-webkit-filter', 'blur(20px)');
+            $('.filePreview').css('-webkit-filter', 'blur(20px)');
+            $('.imgPreview').css('-webkit-filter', 'blur(20px)');
+            $('.metaData').css('-webkit-filter','blur(20px)');
+
         };
 
         $scope.rename_action = function (){
@@ -299,6 +343,13 @@ angular.module('home', ['ngRoute', 'ngFileUpload', 'ngCordova'])
             var n = String(old_url).lastIndexOf("%2F");
             var new_url = String(old_url).substr(0,n);
             var new_url = new_url + "%2F" + new_name;
+
+            $('.profileDets').css('-webkit-filter', 'blur(0px)')
+            $('.mui-appbar').css('-webkit-filter', 'blur(0px)')
+            $('.profileListDiv').css('-webkit-filter', 'blur(0px)')
+            $('.filePreview').css('-webkit-filter', 'blur(0px)')
+            $('.imgPreview').css('-webkit-filter', 'blur(0px)')
+
             $log.info('Renaming:'+rename_path);
             return $http({
                 method: 'PUT',
@@ -313,8 +364,6 @@ angular.module('home', ['ngRoute', 'ngFileUpload', 'ngCordova'])
         };
 
 
-       // <!---------------------------------------------------->
-
         $scope.$watch('files', function () {
             $scope.upload($scope.files);
         });
@@ -325,8 +374,12 @@ angular.module('home', ['ngRoute', 'ngFileUpload', 'ngCordova'])
         $scope.copy_source = "";
         $scope.copy_target = "";
         $scope.upload_pop_up_open = function () {
-            $('.pop_up_window').fadeIn(100);
+            $('.pop_up_window_upload').fadeIn(100);
             $('.uploader').fadeIn(100);
+            $('.subColContainer').css('-webkit-filter', 'blur(10px)');
+            $('.mui-appbar').css('-webkit-filter', 'blur(10px)');
+            $('upload_button_cntr').css('-webkit-filter', 'blur(10px)');
+            $('.subcol_upload_button').css('display', 'none');
         };
 
         $scope.stage_files = function (files) {
@@ -346,10 +399,9 @@ angular.module('home', ['ngRoute', 'ngFileUpload', 'ngCordova'])
                 }
             }
 
-        }
+        };
 
         $scope.upload = function () {
-
             if ($scope.files_to_upload && $scope.files_to_upload.length) {
                 for (var i = 0; i < $scope.files_to_upload.length; i++) {
                     var file = $scope.files_to_upload[i];
@@ -371,6 +423,68 @@ angular.module('home', ['ngRoute', 'ngFileUpload', 'ngCordova'])
                 }
             }
         };
+
+        $scope.getPhoto = function() {
+            Camera.getPicture().then(function(imageURI) {
+                console.log(imageURI);
+            }, function(err) {
+                console.err(err);
+            });
+        };
+
+
+        // $scope.available_metadata = $scope.dataProfile.metadata;
+        $scope.metadata_add_action = function(){
+            var data_path = $scope.dataProfile.domainObject.absolutePath;
+            var new_attribute = $('#new_metadata_attribute').val();
+            var new_value = $('#new_metadata_value').val();
+            var new_unit = $('#new_metadata_unit').val();
+            var att_unique = 'yes';
+            var value_unique = 'yes';
+           
+            if(value_unique == "no" && att_unique == "no"){
+                MessageService.sticky_danger('There is already an AVU with Attribute: "' + new_attribute + '" and Value: "' + new_value + '". Please choose a different Attribute or Value');                    
+                    $('#new_metadata_attribute').addClass('has_error');
+                    $('#new_metadata_value').addClass('has_error');
+                    $('#new_metadata_attribute').focus();
+            }else{
+
+                $http({
+                    method: 'PUT',
+                    url: $globals.backendUrl('metadata'),
+                    params: {irodsAbsolutePath: data_path, attribute: new_attribute, value: new_value, unit: new_unit}
+                }).then(function (response) {
+                    // The then function here is an opportunity to modify the response
+                    $log.info(response);
+                    // The return value gets picked up by the then in the controller.
+                    // return response.data;
+                });
+
+                $http({method: 'GET', url: $globals.backendUrl('file') , params: {path: $scope.dataProfile.domainObject.absolutePath}}).success(function(data){
+                    $scope.new_meta = data;
+                });
+
+                location.reload();
+                // $route.reload();
+
+            }
+        };
+
+        $scope.metadata_delete_action = function(attribute, value, unit){
+            var data_path = $scope.dataProfile.domainObject.absolutePath;
+
+            $http({
+                method: 'DELETE',
+                url: $globals.backendUrl('metadata'),
+                params: {irodsAbsolutePath: data_path, attribute: attribute, value: value, unit: unit}
+            }).then(function (response) {
+                // The then function here is an opportunity to modify the response
+                $log.info(response);
+            });
+            location.reload();
+            // $route.reload();
+        }
+
 
 
 
@@ -419,6 +533,23 @@ angular.module('home', ['ngRoute', 'ngFileUpload', 'ngCordova'])
 
     }])
 
+    .factory('Camera', ['$q', function($q) {
+
+        return {
+            getPicture: function(options) {
+                var q = $q.defer();
+
+                navigator.camera.getPicture(function(result) {
+                    // Do any magic you need
+                    q.resolve(result);
+                }, function(err) {
+                    q.reject(err);
+                }, options);
+
+                return q.promise;
+            }
+        }
+    }])
 
     .factory('collectionsService', ['$http', '$log', 'globals', function ($http, $log, $globals) {
 

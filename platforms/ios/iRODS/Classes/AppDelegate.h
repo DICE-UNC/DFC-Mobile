@@ -25,9 +25,14 @@
 //  Copyright ___ORGANIZATIONNAME___ ___YEAR___. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+//#import <UIKit/UIKit.h>
+//
+//#import <Cordova/CDVViewController.h>
 
-#import <Cordova/CDVViewController.h>
+
+#import "UIKit/UIKit.h"
+
+#import "Cordova/CDVViewController.h"
 
 @interface AppDelegate : NSObject <UIApplicationDelegate>{}
 

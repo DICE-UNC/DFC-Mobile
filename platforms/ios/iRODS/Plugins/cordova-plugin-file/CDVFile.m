@@ -17,11 +17,11 @@
  under the License.
  */
 
-#import <Cordova/CDV.h>
+#import "Cordova/CDV.h"
 #import "CDVFile.h"
 #import "CDVLocalFilesystem.h"
 #import "CDVAssetLibraryFilesystem.h"
-#import <objc/message.h>
+#import "objc/message.h"
 
 static NSString* toBase64(NSData* data) {
     SEL s1 = NSSelectorFromString(@"cdv_base64EncodedString");

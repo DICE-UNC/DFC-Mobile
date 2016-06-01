@@ -13,12 +13,17 @@ angular.module('myApp', [
     'globalsModule',
     'httpInterceptorModule',
     'fileModule',
-]).
-    config(['$routeProvider', function ($routeProvider) {
+    'myApp.metadata',
+    //'fileService',
+    'ngCordova',
+])
+    .config(['$routeProvider', function ($routeProvider) {
         $routeProvider.otherwise({redirectTo: '/home'});
     }]).config(['$httpProvider', function ($httpProvider) {
         $httpProvider.defaults.withCredentials = true;
     }]);
+
+
 
 angular.module('globalsModule', [])
     .factory('globals', function ($rootScope) {
@@ -195,6 +200,9 @@ angular.module('globalsModule', [])
     });
 
 
+
+
+
 angular.module('fileModule',[])
     .factory('fileService', ['$http', '$log', '$q','globals',function ($http, $log, $q, globals) {
 
@@ -367,3 +375,4 @@ angular.module('fileModule',[])
         };
 
     }]);
+'use strict';

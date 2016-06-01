@@ -19,9 +19,9 @@
 
 #import "CDVFile.h"
 #import "CDVLocalFilesystem.h"
-#import <Cordova/CDV.h>
-#import <MobileCoreServices/MobileCoreServices.h>
-#import <sys/xattr.h>
+#import "Cordova/CDV.h"
+#import "MobileCoreServices/MobileCoreServices.h"
+#import "sys/xattr.h"
 
 @implementation CDVLocalFilesystem
 @synthesize name=_name, fsRoot=_fsRoot, urlTransformer;

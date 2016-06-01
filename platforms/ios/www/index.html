@@ -9,6 +9,10 @@
     <title>iRODS Mobile</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta http-equiv="Content-Security-Policy" content="default-src *; script-src 'self' 'unsafe-inline' 'unsafe-eval' *; style-src  'self' 'unsafe-inline' *">
+
+
     <link rel="stylesheet" href="components/angular-message-center/message-center.css">
 
     <link rel="stylesheet" href="styles/app.css">
@@ -31,14 +35,17 @@
     <script src="js/app.js"></script>
     <script src="js/jquery-1.11.2.min.js"></script>
     <script src="js/globals.js"></script>
+    <script src="js/fileServices.js"></script>
     <script src="login/login.js"></script>
     <script src="home/home.js"></script>
     <script src="upload/upload.js"></script>
+    <script src="profile/metadata.js"></script>
 
     <script src="profile/profile.js"></script>
     <script src="home/fileServices.js"></script>
     <script src="subCol/subCol.js"></script>
 
+    <script src="lib/ionic/js/ionic.bundle.js"></script>
     <script src="js/ng-cordova.min.js"></script>
     <script src="js/cordova.js"></script>
 
@@ -48,7 +55,111 @@
 
     <script src="js/mui.min.js"></script>
 
+
     <!--Custom JS Functions-->
+    <script type="text/javascript">
+
+        document.addEventListener("deviceready", onDeviceReady, false);
+
+        var fileTransfer;
+        var uri;
+        var fileURL;
+
+        function onDeviceReady() {
+            console.log(File);
+            console.log(FileTransfer);
+            console.log("Now safe to use cordova API");
+
+            fileTransfer = new FileTransfer();
+        }
+
+        function downloadTheFile(url, fileName){
+
+
+
+
+
+            console.log("you're here");
+            var filePath = encodeURI("/storage/emulated/0/Download/"+fileName);
+
+            var uri = encodeURI(url);
+
+            fileTransfer.download(
+                    uri,
+                    filePath,
+                    function(entry) {
+                        console.log("download complete: " + entry.fullPath);
+                    },
+                    function(error) {
+                        console.log("download error source " + error.source);
+                        console.log("download error target " + error.target);
+                        console.log("upload error code" + error.code);
+                    }
+            );
+        }
+    </script>
+
+    <script type="text/javascript">
+        function takePicture() {
+            navigator.camera.getPicture(function(imageURI) {
+
+                // imageURI is the URL of the image that we can use for
+                // an <img> element or backgroundImage.
+
+            }, function(err) {
+
+                // Ruh-roh, something bad happened
+
+            }, cameraOptions);
+        }
+
+    </script>
+
+    <script type="text/javascript">
+        $(window).bind('scroll', function() {
+            if ($(window).scrollTop() > 100) {
+                $('#uploadPlus').css('transform','translateY(200%)');
+            }
+            else {
+                $('#uploadPlus').css('transform','translateY(0%)');
+            }
+        });
+    </script>
+
+    <script>
+
+        function loadFile(){
+            var oFrame = document.getElementById("frmFile");
+            var strRawContents = oFrame.contentWindow.document.body.childNodes[0].innerHTML;
+            while (strRawContents.indexOf("\r") >= 0)
+                strRawContents = strRawContents.replace("\r", "");
+            var arrLines = strRawContents.split("\n");
+            alert("File " + oFrame.src + " has " + arrLines.length + " lines");
+            for (var i = 0; i < arrLines.length; i++) {
+                var curLine = arrLines[i];
+                alert("Line #" + (i + 1) + " is: '" + curLine + "'");
+            }
+        }
+    </script>
+
+
+    <script>
+
+        jQuery("document").ready(function($){
+
+            var nav = $('.profileListBut');
+
+            $(window).scroll(function () {
+                if ($(this).scrollTop() > 136) {
+                    nav.addClass("f-nav");
+                } else {
+                    nav.removeClass("f-nav");
+                }
+            });
+
+        });
+
+    </script>
 
     <script type="text/javascript">
         $(function() {
@@ -59,6 +170,11 @@
     <script>
         function goBack() {
             window.history.back();
+
+            $('.subColContainer').css('-webkit-filter', 'blur(0px)');
+            $('.subColFooter').css('-webkit-filter', 'blur(0px)');
+            $('.upload_button_cntr').css('-webkit-filter', 'blur(0px)');
+            $('.mui-appbar').css('-webkit-filter', 'blur(0px)');
         }
     </script>
 
@@ -113,8 +229,11 @@
                 <!--<div ng-controller="homeCtrl">-->
                     <td class="mui-appbar-height">
                         <div class="mui-dropdown">
-                            <button class="mui-btn" data-mui-color="primary" onclick="goBack()">
+                            <button class="mui-btn" data-mui-color="primary" onclick="goBack()" style="margin-left: 10px;">
                                 &#10094
+                            </button>
+                            <button class="mui-btn" data-mui-color="primary" style="font-size:29px; margin-bottom:10px;" ng-click="goHome()">
+                                &#8962
                             </button>
                         </div>
                     </td>
@@ -130,20 +249,38 @@
                     <td class="mui-text-right" align="right">
 
                         <div class="mui-dropdown">
-                            <button class="mui-btn" data-mui-color="primary" data-mui-toggle="dropdown">
+                            <button class="mui-btn" data-mui-color="primary" data-mui-toggle="dropdown" style="margin-right:5px;">
                                 &#8942
                             </button>
-                            <ul class="mui-dropdown-menu" data-mui-align="right">
-                                <li class="dropdown-menu-item" ng-show="shouldHideUpload() == false"><a class="dropdown-menu-item-anchor" ng-click="upload_pop_up_open()">Upload</a></li>
-                                <li class="dropdown-menu-item"><a class="dropdown-menu-item-anchor" >Cloud Browser</a></li>
-                                <li class="dropdown-menu-item"><a class="dropdown-menu-item-anchor" ng-click="logout_func()">Log Out</a></li>
+
+                            <ul class="mui-dropdown-menu" data-mui-align="right" style="margin-top:8px">
+                                <li class="dropdown-menu-item">
+                                    <a class="dropdown-menu-item-anchor" ng-click="refresh()">Refresh</a>
+                                </li>
+                                <li class="dropdown-menu-item" ng-hide="shouldHideUpload()">
+                                    <a class="dropdown-menu-item-anchor" ng-click="upload_pop_up_open()">Upload</a>
+                                </li>
+                                <li class="dropdown-menu-item" ng-hide="shouldHideProf()">
+                                    <a class="dropdown-menu-item-anchor" ng-click="rename_pop_up_open()">Rename</a>
+                                </li>
+<!--                                 <li class="dropdown-menu-item" ng-hide="shouldHideProf()">
+                                    <a class="dropdown-menu-item-anchor" style="text-decoration: none;" href="{{downloadURL}}">Download</a>
+                                </li> -->
+                                <li class="dropdown-menu-item" ng-hide="shouldHideProf()">
+                                    <a class="dropdown-menu-item-anchor" ng-click="delete_pop_up_open()">Delete</a>
+                                </li>
+                                <li class="dropdown-menu-item">
+                                    <a class="dropdown-menu-item-anchor" >Cloud Browser</a>
+                                </li>
+                                <li class="dropdown-menu-item">
+                                    <a class="dropdown-menu-item-anchor" ng-click="logout_func()">Log Out</a>
+                                </li>
                             </ul>
                         </div>
                         <!--</div>-->
                     </td>
             </tr>
         </table>
-
     </div>
 
 

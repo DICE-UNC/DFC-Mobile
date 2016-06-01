@@ -88,15 +88,23 @@ angular.module('subCol', ['ngRoute', 'ngFileUpload'])
 
         $scope.delete_pop_up_open = function(){
             $('.renamer').fadeOut(100);
-            $('.pop_up_window').fadeIn(100);
+            $('.pop_up_window_rename').fadeOut(100);
+            $('.pop_up_window_upload').fadeOut(100);
+            $('.pop_up_window_delete').fadeIn(100);
             $(".delete_container ul").append('<li class="light_back_option_even"><div class="col-xs-7 list_content"><img src="home/img/Icons/data_object_icon.png">'+$scope.dataProfile.childName+'</div></li>');
             $('.deleter').fadeIn(100);
         };
 
         $scope.pop_up_close = function () {
-            $('.pop_up_window').fadeOut(100);
+            $('.pop_up_window_upload').fadeOut(100);
             $('.deleter').fadeOut(100);
             $('.renamer').fadeOut(100);
+            $('.subColContainer').css('-webkit-filter', 'blur(0px)');
+            $('.subColFooter').css('-webkit-filter', 'blur(0px)');
+            $('.upload_button_cntr').css('-webkit-filter', 'blur(0px)');
+            $('.mui-appbar').css('-webkit-filter', 'blur(0px)');
+            $('.subcol_upload_button').css('display', 'block');
+
         };
 
         $scope.selectProfile = function (irodsAbsolutePath) {
@@ -111,6 +119,11 @@ angular.module('subCol', ['ngRoute', 'ngFileUpload'])
             $location.url("/profile/");
             $location.search("path", irodsAbsolutePath);
 
+            $('.subColContainer').css('-webkit-filter', 'blur(0px)');
+            $('.subColFooter').css('-webkit-filter', 'blur(0px)');
+            $('.upload_button_cntr').css('-webkit-filter', 'blur(0px)');
+            $('.mui-appbar').css('-webkit-filter', 'blur(0px)');
+
         }
 
         $scope.$watch('files', function () {
@@ -124,8 +137,14 @@ angular.module('subCol', ['ngRoute', 'ngFileUpload'])
         $scope.copy_source = "";
         $scope.copy_target = "";
         $scope.upload_pop_up_open = function () {
-            $('.pop_up_window').fadeIn(100);
+            $('.pop_up_window_upload').fadeIn(100);
             $('.uploader').fadeIn(100);
+
+            $('.subColContainer').css('-webkit-filter', 'blur(10px)');
+            $('.mui-appbar').css('-webkit-filter', 'blur(10px)');
+            $('upload_button_cntr').css('-webkit-filter', 'blur(10px)');
+            $('.subColFooter').css('-webkit-filter', 'blur(10px)');
+            $('.subcol_upload_button').css('display', 'none');
         };
 
         $scope.stage_files = function (files) {
@@ -146,6 +165,30 @@ angular.module('subCol', ['ngRoute', 'ngFileUpload'])
             }
 
         }
+
+        $scope.elmsDisplayed = 25;
+
+        $scope.numElmsinSubCol = function(){
+            var totNum = $scope.collectionListingInSubcol.collectionAndDataObjectListingEntries.length;
+            if(totNum > 25){
+                return $scope.elmsDisplayed;
+            }else{
+                return $scope.collectionListingInSubcol.collectionAndDataObjectListingEntries.length;
+            }
+        }
+
+        $scope.show25More = function(){
+           $scope.elmsDisplayed += 25;
+        }
+
+        $scope.shouldOfferMore = function(){
+            if($scope.elmsDisplayed >= $scope.collectionListingInSubcol.collectionAndDataObjectListingEntries.length){
+                return false;
+            }
+            return true;
+        }
+
+
 
 
         $scope.upload = function () {
@@ -171,8 +214,6 @@ angular.module('subCol', ['ngRoute', 'ngFileUpload'])
             }
             $route.reload();
         };
-
-
 
     }])
 

@@ -50,6 +50,12 @@
         },
         "cordova-plugin-file-transfer": {
             "PACKAGE_NAME": "io.cordova.hellocordova"
+        },
+        "cordova-plugin-camera": {
+            "PACKAGE_NAME": "io.cordova.hellocordova"
+        },
+        "cordova-custom-config": {
+            "PACKAGE_NAME": "io.cordova.iRODS"
         }
     },
     "dependent_plugins": {}
