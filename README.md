@@ -26,28 +26,31 @@ Google Play Android App Market:
 
 ## Requirement
 
- * Node.js  - [Install Node.js](http://nodejs.org)
- * Cordova  - Install by `npm install cordova`
- * Onsen UI - Install by `$ bower install onsenui`
+To Test:
+iRODS Cloud Browser Mobile can be ran locally if hosted on a local HTTP Server.
+To run local HTTP Server:
+
+$ cd .../DFC-Mobile
+$ python -m SimpleHTTPServer 8000
+
+App will be hosted at 0.0.0.0:8000
 
 
 ### Directory Layout
 
-    README.md     --> This file
-    gulpfile.js   --> Gulp tasks definition
-    www/          --> Asset files for app
-      index.html  --> App entry point (login page)
-      app.html    --> Main App
-      img/        --> Images and Icons Used 
-      js/
-      styles/
-      lib/onsen/
-        stylus/   --> Stylus files for onsen-css-components.css
-        js/       --> JS files for Onsen UI
-        css/      --> CSS files for Onsen UI
-    platforms/    --> Cordova platform directory
-    plugins/      --> Cordova plugin directory
-    merges/       --> Cordova merge directory
-    hooks/        --> Cordova hook directory
-
+    README.md        --> This file
+    index.html       --> App entry point (login page)
+    js/
+      app.js         --> Angular main app.js
+      controllers.js --> Angular app controllers
+      directives.js  --> Angular app directives
+      routes.js      --> Angular routing services
+      services.js    --> Factory created servcies
+    img/             --> Location for Images
+    lib/             --> Ionic and Angular libraries
+    templates/       --> HTML templates for views
+      home.html
+      login.html
+      menu.html
+      profile.html
 
