@@ -1,0 +1,50 @@
+<ion-view title="Login" id="page4" class=" ">
+    <ion-content padding="true" class="has-header">
+
+        <form id="login-form1" class="list ">
+            <ion-list id="login-list2" class=" ">
+
+
+                <label class="item item-input " id="login-input3">
+                    <span class="input-label">Host</span>
+                    <input ng-model="$parent.host" type="text" placeholder="">
+                </label>
+                <label class="item item-input " id="login-input7">
+                    <span class="input-label">Port</span>
+                    <input ng-model="$parent.port" type="number" placeholder="">
+                </label>
+                <label class="item item-input " id="login-input8">
+                    <span class="input-label">Zone</span>
+                    <input ng-model="$parent.zone" type="text" placeholder="">
+                </label>
+                <label class="item item-input " id="login-input9">
+                    <span class="input-label">Username</span>
+                    <input ng-model="$parent.userName" type="text" placeholder="">
+                </label>
+                <label class="item item-input " id="login-input4">
+                    <span class="input-label">Password</span>
+                    <input ng-model="$parent.password" type="password" placeholder="">
+                </label>
+            </ion-list>
+
+            <div class="spacer" style="width: 300px; height: 14px;"></div>
+
+            <label class="item item-select " id="login-select1">
+                <span class="input-label">Authentification</span>
+                <select ng-model="$parent.authType" >
+                    <option>Standard</option>
+                    <option>PAM</option>
+                </select>
+            </label>
+
+            <div class="spacer" style="width: 300px; height: 56px;"></div>
+
+            <button ng-click="submitLogin()" id="login-button1" class=" button button-stable  button-block ">
+                Log in
+            </button>
+
+
+
+        </form>
+    </ion-content>
+</ion-view>
