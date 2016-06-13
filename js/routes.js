@@ -1,6 +1,10 @@
 angular.module('app.routes', [])
 
-.config(function($stateProvider, $urlRouterProvider) {
+.config(function($stateProvider, $urlRouterProvider, $httpProvider) {
+
+  $httpProvider.defaults.withCredentials = true;
+  $httpProvider.defaults.useXDomain = true;
+
 
   // Ionic uses AngularUI Router which uses the concept of states
   // Learn more here: https://github.com/angular-ui/ui-router
@@ -43,6 +47,7 @@ angular.module('app.routes', [])
   .state('menu', {
     url: '/side-menu21',
     templateUrl: 'templates/menu.html',
+    controller: 'homeCtrl',
     abstract:true
   })
 

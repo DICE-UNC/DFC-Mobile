@@ -5,9 +5,16 @@ angular.module('app.controllers', [])
  //*      HOME       *
  //*   CONTROLLER    *
  //=================== 
-.controller('homeCtrl', ['$scope', '$log', '$http', 'globals', function($scope, $log, $http, $globals) {
-	// $scope.pagingAwareCollectionListing = pagingAwareCollectionListing;
+.controller('homeCtrl', ['$scope', '$log', '$http', 'globals', '$state', function($scope, $log, $http, $globals, $state) {
 	$scope.title = "testName";
+	$scope.collectionListingDropdown;
+
+	$scope.goHome = function(){
+
+		$log.info("going home");
+		$scope.listVirtualCollections();
+		
+	}
 
 	$scope.listVirtualCollections = function () {
 
@@ -18,10 +25,25 @@ angular.module('app.controllers', [])
         	url: $globals.backendUrl('collection/Starred%20Files?offset=0&path=')
         }).success(function (data) {
             $scope.collectionListingDropdown = data;
+            $log.info(data);
         }).error(function () {
             $scope.collectionListingDropdown = [];
         });
     };
+
+    $scope.goSubCol = function(path){
+    	$log.info("getting "+path+" collection");
+    	var url = $globals.subCollectionURL(path);
+
+        return $http({
+        	method: 'GET', 
+        	url: url
+        }).success(function (data) {
+            $scope.collectionListingDropdown = data;
+        }).error(function () {
+            $scope.collectionListingDropdown = [];
+        });
+    }
 }])
 
 

@@ -1,10 +1,8 @@
 angular.module('app.services', [])
 
-.factory('BlankFactory', [function(){
 
-}])
 
-.factory('globals', function ($rootScope) {
+.factory('globals',['$rootScope', '$log', '$location', '$injector', function ($rootScope, $log, $location,  $injector) {
 
         var f = {};
 
@@ -20,6 +18,10 @@ angular.module('app.services', [])
             return HOST + relativeUrl;
         };
 
+        f.subCollectionURL = function(normURL){
+            var URL = normURL.replace("/","%2F");
+            return "http://dfcweb.datafed.org:8080/irods-cloud-backend/collection/Starred%20Files?offset=0&path="+URL;
+        }
 
         /**
          * Saved path in case an auth exception required a new login
@@ -65,7 +67,7 @@ angular.module('app.services', [])
 
         return f;
 
-})
+}])
 
 .factory('collectionsService', ['$http', '$log', 'globals', function ($http, $log, $globals) {
 
@@ -130,7 +132,10 @@ angular.module('app.services', [])
 
             listUserVirtualCollections: function () {
                 $log.info("getting virtual colls");
-                return $http({method: 'GET', url: globals.backendUrl('virtualCollection')}).success(function (data) {
+                return $http({
+                    method: 'GET', 
+                    url: globals.backendUrl('virtualCollection')
+                }).success(function (data) {
                     virtualCollections = data;
                 }).error(function () {
                     virtualCollections = [];

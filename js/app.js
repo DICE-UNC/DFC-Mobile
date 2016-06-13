@@ -13,6 +13,12 @@ angular.module('app', [
   'app.directives'
 ])
 
+// .config(['$httpProvider', function ($httpProvider) {
+//   $httpProvider.defaults.withCredentials = true;
+//   $httpProvider.defaults.useXDomain = true;
+//   // delete $httpProvider.defaults.headers.common['X-Requested-With'];
+// }]);
+
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
