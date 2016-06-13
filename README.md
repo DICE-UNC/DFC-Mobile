@@ -31,6 +31,7 @@ iRODS Cloud Browser Mobile can be ran locally if hosted on a local HTTP Server.
 To run local HTTP Server:
 
 $ cd .../DFC-Mobile
+
 $ python -m SimpleHTTPServer 8000
 
 App will be hosted at 0.0.0.0:8000
