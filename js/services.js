@@ -167,7 +167,22 @@ angular.module('app.services', [])
 
 }])
 
-.service('BlankService', [function(){
+.service('profileService', [ function(){
+    var profileObject = [];
 
+    var setProfileObj = function(profObj){
+        profileObject = profObj;
+    };
+
+    var getProfileObj = function(){
+        if(profileObject != []){
+            return profileObject;
+        }
+    };
+
+    return{
+        setProfileObj: setProfileObj,
+        getProfileObj: getProfileObj
+    };
 }]);
 

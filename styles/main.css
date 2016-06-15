@@ -1,0 +1,47 @@
+/* Navigation */
+
+.ion-ios-plus{
+	font-size: 50px;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+#backBtn{
+	display: none;
+	z-index: 0;
+   	float:left;
+   	position: absolute;
+   	-webkit-transition: display .4s;
+
+
+}
+
+#searchTerm{
+	width: 100%;
+	float: right;
+	border: 1px solid #3e82f5;
+	border-radius: 10px;
+	padding-left: 10px;
+	-webkit-transition: width .3s;
+	z-index: 10;
+	position: relative;
+}
+
+/* Profile */
+#profile-heading1{
+	text-align: center;
+}
+
+#imgPreview{
+	width: 80%;
+	display: block;
+    margin: auto;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+#fileDeets{
+	margin-left: 40px;
+}
