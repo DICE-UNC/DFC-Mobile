@@ -1,0 +1,132 @@
+/* Navigation */
+
+.ion-ios-plus{
+	font-size: 60px;
+	z-index: 99;
+	position: fixed;
+	bottom: 0;
+	right: 0;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+#backBtn{
+	display: none;
+	z-index: 0;
+   	float:left;
+   	position: absolute;
+   	-webkit-transition: display .4s;
+
+
+}
+
+#searchTerm{
+	width: 100%;
+	float: right;
+	border: 1px solid #3e82f5;
+	border-radius: 10px;
+	padding-left: 10px;
+	-webkit-transition: width .3s;
+	z-index: 10;
+	position: relative;
+}
+
+/* Profile */
+#profile-heading1{
+	text-align: center;
+}
+
+#imgPrvewDiv{
+	width: 100%;
+	overflow: hidden;
+}
+
+#imgPreview{
+	max-width: 65%;
+	max-height: 100%;
+	display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+#fileDeets{
+	margin-left: 40px;
+}
+
+#uploadButtonDiv{
+	position: fixed;
+	bottom: 0;
+}
+
+.uploadButton{
+	transform: translate(-30px, -20px);
+
+}
+
+#metaData{
+	text-align: center;
+	margin-bottom: 50px;
+}
+
+#mdTable{
+	width: 100%;
+}
+
+.metaDataRow:nth-child(even){
+	background-color: #f2f2f2;
+}
+
+
+#mdHeader{
+	background-color: #3e82f5;
+	color: white;
+}
+
+.metaDataColumn{
+	width: 30%;
+	padding-left: 3px;
+	padding-right: 3px;
+}
+
+.mdAdRm{
+	width: 5%;
+}
+
+#new_metadata_attribute{
+	background: none;
+	border-bottom: solid black 1px;
+}
+
+#new_metadata_value{
+	background: none;
+	border-bottom: solid black 1px;
+}
+
+#new_metadata_unit{
+	background: none;
+	border-bottom: solid black 1px;
+}
+
+#profileFooter{
+	position: fixed;
+	bottom:0px;
+    left:0px;
+    right:0px;
+    margin-bottom:0px;
+}
+
+.footerButtons{
+	width: 100%;
+	margin: auto;
+	text-align: center;
+}
+
+.footerButton{
+	font-size: 200%;
+	margin-right: 20%;
+	margin-left: 20%;
+}

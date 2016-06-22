@@ -1,0 +1,62 @@
+<ion-view title="" id="page5" class=" ">
+    <ion-content padding="true" class="has-header">
+
+    <ion-refresher
+        pulling-text="Pull to refresh..."
+        on-refresh="doRefresh()">
+    </ion-refresher>
+        
+        <h1 id="profile-heading1" style="color:#000000;" class=" ">
+            {{profileObject.childName}}
+        </h1>
+
+
+        <div id="imgPrvewDiv">
+            <img id="imgPreview" ng-show="shouldShowImg()" src='{{getDownloadLink()}}'>
+        </div>
+
+        <div id="fileDeets">
+            <p><strong>File Path:</strong> {{profileObject.domainObject.absolutePath}}</p>
+            <p><strong>File Size:</strong> {{profileObject.domainObject.displayDataSize}}</p>
+            <p><strong>File Type:</strong> {{profileObject.mimeType}}</p>
+            <p><strong>Created:</strong> {{profileObject.domainObject.createdAt}}</p>
+            <p><strong>Last Modified:</strong> {{profileObject.domainObject.modifiedAt}}</p>
+            <p><strong>Owner:</strong> {{profileObject.domainObject.dataOwnerName}}</p>
+            <p><strong>Zone:</strong> {{profileObject.domainObject.dataOwnerZone}}</p>
+            <p><strong>ID:</strong> {{profileObject.domainObject.id}}</p>
+            <br>
+            <p ng-show="hasComments()"><strong>Description:</strong> {{profileObject.domainObject.comments}}</p>
+        </div>
+
+        <div id="metaData">
+            <table id="mdTable">
+                <tr class="metaDataRow" id="mdHeader">
+                    <td class="metaDataColumn">Attribute</td>
+                    <td class="metaDataColumn">Value</td>
+                    <td class="metaDataColumn">Unit</td>
+                    <td class="metaDataColumn">+/-<td>
+                </tr>
+                <tr class="metaDataRow" ng-repeat="mdObject in profileObject.metadata">
+                    <td class="metaDataColumn">{{mdObject.avuAttribute}}</td>
+                    <td class="metaDataColumn">{{mdObject.avuValue}}</td>
+                    <td class="metaDataColumn">{{mdObject.avuUnit}}</td>
+                    <td class="mdAdRm"><i class="icon ion-ios-close-outline uploadButton" ng-click="metadata_delete_action(mdObject.avuAttribute, mdObject.avuValue, mdObject.avuUnit)"></i></td>
+                </tr>
+                <tr class="metaDataRow">
+                    <td class="metaDataColumn"><input ng-model="newAttr" type="text" id="new_metadata_attribute"></input></td>
+                    <td class="metaDataColumn"><input ng-model="newVal" type="text" id="new_metadata_value"></input></td>
+                    <td class="metaDataColumn"><input ng-model="newUnit" type="text" id="new_metadata_unit"></input></td>
+                    <td class="mdAdRm"><i ng-click="metadata_add_action()" class="icon ion-ios-plus-outline uploadButton"></i></td>
+                </tr>
+            </table>
+        </div>
+
+    </ion-content>
+
+    <div class="bar bar-footer bar-stable" id="profileFooter">
+        <div class="footerButtons">
+            <i ng-click="renamePopup()" class="icon ion-edit footerButton"></i>
+            <i ng-click="deletePopup()" class="icon ion-ios-trash footerButton"></i>
+        </div>
+    </div>
+</ion-view>

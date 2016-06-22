@@ -1,0 +1,110 @@
+(*
+	LIST: the list ADT
+
+	Matthew Krause
+
+
+	list is a homogeneous abstract
+	data type of int
+
+	new:	int 		 --> LIST
+	ins: 	LIST x int x int --> LIST
+	rem: 	LIST x int 	 --> LIST
+	get: 	LIST x int	 --> int
+	find: 	LIST x int	 --> int
+	size:	LIST		 --> int
+	empty:	LIST		 --> bool
+
+*)
+
+datatype LIST = 
+New of int
+| ins of LIST * int * int
+;
+
+fun rem( New(n), i ) = New(n)
+| rem( ins(L,e,k), i ) = if(i=k)
+			     then L
+			    else if(i>k)
+			     then ins(rem(L,i-1),e,k)
+			     else ins(rem(L,i),e,k-1)
+;
+
+exception emptyList;
+
+fun get( New(n), i ) = raise emptyList
+| get( ins(L,e,k), i ) = if(i=k)
+			    then e
+			    else get(L,i)
+;
+
+fun find( New(n), e ) = raise emptyList
+| find( ins(L,e,i), f ) = if(e=f)
+			     then i
+			    else if(find(L,f)<i)
+			     then find(L,f)
+			     else find(L,f)+1
+;
+
+fun size( New(n) ) = 0
+| size( ins(L,e,i) ) = size(L) + 1
+;
+
+fun empty( New(n) ) = true
+| empty( ins(L,e,i) ) = false
+;
+
+
+(* Test Cases *)
+
+val li0 = New(5)
+val li1 = ins(li0, 10, 1);
+val li2 = ins(li1, 20, 2);
+val li3 = ins(li2, 30, 3);
+
+val lir = rem(li3, 2);
+val new = rem(New(1), 2);
+
+val thi = get(li3, 3);
+val exp = get(New(1), 3);
+
+val two = find(li3, 20);
+val exp = find(New(1), 3);
+
+val two = size(li2);
+val thr = size(li3);
+val zer = size(li0);
+
+val tru = empty(li0);
+val fal = empty(li3);
+
+(*
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *)
+
+
+
+
+
+

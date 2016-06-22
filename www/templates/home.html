@@ -1,0 +1,54 @@
+<div>
+
+
+    <ion-view title="{{currentCollection()}}" id="page1" class=" " ng-init="landing()">
+        <div class="bar bar-subheader">
+            <button ng-show="currentCollection()!='Starred Collection'" ng-click="goBack()" class="button button-clear button-positive backNavButton" id="backBtn">
+                Parent Collection
+            </button>   
+            <input type="text" id="searchTerm" placeholder="Search"
+               class="search_box" onkeyup="doSearch()" />
+        </div>
+        <ion-content padding="true" class="has-subheader">
+            <ion-refresher
+                pulling-text="Pull to refresh..."
+                on-refresh="doRefresh()">
+            </ion-refresher>
+
+            <ion-list id="home-list4" class=" ">
+
+                <!-- Collections -->
+                <ion-item ng-repeat="name in collectionListingDropdown.collectionAndDataObjectListingEntries" ng-click="goSubCol(name.formattedAbsolutePath)" ng-show="!{{name.dataObject}}" class="item-icon-left">
+                    <i ng-show="!{{name.dataObject}}" class="icon ion-ios-folder-outline"></i>
+                    <h2>{{name.nodeLabelDisplayValue}}</h2>
+                </ion-item>
+
+                <!-- Data Objects-->
+                <ion-item ng-repeat="name in collectionListingDropdown.collectionAndDataObjectListingEntries" ng-click="goProfile(name)" ng-show="{{name.dataObject}}" class="item-icon-left">
+                    <i ng-show="{{name.dataObject}}" class="icon ion-document"></i>
+                    <h2>{{name.nodeLabelDisplayValue}}</h2>
+                </ion-item>
+
+            </ion-list>
+
+
+
+<!--             <div>
+
+                <a ng-repeat="crumb in breadCrumb" ng-click="breadCrumbGo(crumb)">{{crumb}} > </a>
+                <a>{{currentCollection()}}</a>
+            </div> -->
+
+            
+            
+
+        </ion-content>
+
+            <div>Outside of content</div>
+
+            <label ng-show="currentCollection()!='Starred Collection'" for="file-upload" onchange="angular.element(this).scope().openUpload()">
+                <i class="icon ion-ios-plus uploadButton"></i>
+                <input id="file-upload" type="file" name="file-upload" />
+            </label>
+    </ion-view>
+</div>
