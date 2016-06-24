@@ -1,0 +1,11 @@
+Raleigh      Durham        14
+  Durham       Hillsborough  9
+  Chapel_hill  Graham        25
+  Chapel_hill  Carrboro      1
+  Carboro      Cary          32
+  Cary         Raleigh       3
+  Pittsboro    Cary          17
+  Pittsboro    Sanford       15
+  Sanford      Los_angeles   3012
+  -1
+  Pittsboro

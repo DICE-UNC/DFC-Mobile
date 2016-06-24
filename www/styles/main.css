@@ -70,7 +70,9 @@ input[type="file"] {
 #metaData{
 	text-align: center;
 	margin-bottom: 50px;
-}
+	width: 100%;
+/*	overflow: scroll;
+*/}
 
 #mdTable{
 	width: 100%;
@@ -87,28 +89,36 @@ input[type="file"] {
 }
 
 .metaDataColumn{
-	width: 30%;
+/*	width: 30%;*/
 	padding-left: 3px;
 	padding-right: 3px;
+	width: 31%;
+	overflow: scroll;
 }
 
 .mdAdRm{
-	width: 5%;
+	width: 10%;
 }
 
 #new_metadata_attribute{
 	background: none;
 	border-bottom: solid black 1px;
+	width: 100%;
+	overflow: scroll;
 }
 
 #new_metadata_value{
 	background: none;
 	border-bottom: solid black 1px;
+	width: 100%;
+	overflow: scroll;
 }
 
 #new_metadata_unit{
 	background: none;
 	border-bottom: solid black 1px;
+	width: 100%;
+	overflow: scroll;
 }
 
 #profileFooter{

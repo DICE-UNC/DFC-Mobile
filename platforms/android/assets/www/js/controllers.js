@@ -5,12 +5,22 @@ angular.module('app.controllers', [])
  //*      HOME       *
  //*   CONTROLLER    *
  //=================== 
-.controller('homeCtrl', ['$scope', '$log', '$http', 'globals', '$state', 'Upload', 'profileService', '$ionicPopup', function($scope, $log, $http, $globals, $state, Upload, profileService, $ionicPopup) {
+.controller('homeCtrl', ['$scope', '$rootScope', '$log', '$http', 'globals', '$state', 'Upload', 'profileService', '$ionicPopup', '$window', 'loginService', function($scope, $rootScope, $log, $http, $globals, $state, Upload, profileService, $ionicPopup, $window, $loginService) {
 	$scope.collectionListingDropdown;
 
 	$scope.$on('goHome', function(event, args) {
+        $log.info("goHome broadcast recvd");
 		$scope.listVirtualCollections();
 	});
+
+    $rootScope.$on("loggedIn", function(){
+        $scope.landing();
+    });
+
+    $scope.landing = function(){
+        $log.info("ng-init done. Listing starred collection");
+        $scope.listVirtualCollections();
+    }
 
 	$scope.listVirtualCollections = function () {
 
@@ -22,30 +32,65 @@ angular.module('app.controllers', [])
         }).success(function (data) {
         	$log.info("Setting starred collection as view");
             $scope.collectionListingDropdown = data;
-            $log.info("Set");
-            $log.info(data);
             $log.info($scope.collectionListingDropdown);
         }).error(function () {
-        	$state.go('login');
-        	$scope.plsLogInAlt();
-            $scope.collectionListingDropdown = [];
+            $state.go('login');
+                $scope.plsLogInAlt();
+                $scope.collectionListingDropdown = [];
+            var localStg = $globals.getHost();
+            $log.info("localStorage host is:"+localStg);
+            if(localStg!="null"|localStg!=null){
+                $log.info("Host localStorage is read as not null");
+                $scope.autoLogin();
+            }else{
+                $state.go('login');
+                $scope.plsLogInAlt();
+                $scope.collectionListingDropdown = [];
+            }
         });
     };
+
+    $scope.autoLogin = function(){
+        $log.info("autologin detected");
+        var actval = {
+            host: $globals.getHost(),
+            port: $globals.getPort(),
+            zone: $globals.getZone(),
+            userName: $globals.getUN(),
+            password: $globals.getPW(),
+            authType: $globals.getAuth(),
+            resource: ""
+        }
+
+        $log.info("autlogin creds are:" + actval);
+
+        $http({
+            method: 'POST',
+            url: $globals.backendUrl('login/'),
+            data: actval,
+            headers: { 'Content-Type': 'application/json' }  // set the headers so angular passing info as request payload
+        }).then(function(data){
+            $scope.listVirtualCollections();
+        });
+    }
 
    	$scope.plsLogInAlt = function() {
 	   var alertPopup = $ionicPopup.alert({
 	    	title: 'Please log in',
-	    	template: 'You are currently not logged in'
+	    	template: 'You are not currently logged in'
    		})
 	}
 
     $scope.currentCollection = function(){
+        if($scope.collectionListingDropdown == ""){
+            return "Starred Collection";
+        }
     	if($scope.collectionListingDropdown.collectionAndDataObjectListingEntries[0].description == "Starred from Cloud Browser"){
     		document.getElementById("searchTerm").style.width = "100%";
     		// $('#searchTerm').css('width', '100%');
     		return "Starred Collection";
     	}else{
-    		document.getElementById("searchTerm").style.width = "55%";
+    		document.getElementById("searchTerm").style.width = "60%";
     		document.getElementById("backBtn").style.display = "inline";
 
     		var path = $scope.collectionListingDropdown.collectionAndDataObjectListingEntries[0].parentPath;
@@ -95,10 +140,20 @@ angular.module('app.controllers', [])
 
     $scope.doRefresh = function(){
     	$log.info("refreshing");
-    	var path = $scope.collectionListingDropdown.collectionAndDataObjectListingEntries[0].parentPath;
-    	$log.info("current path is "+path);
-    	$scope.goSubCol(path);
-    	$scope.$broadcast('scroll.refreshComplete');
+        if($scope.collectionListingDropdown == ""){
+            $scope.listVirtualCollections();
+            $scope.$broadcast('scroll.refreshComplete');
+        }else{
+            if($scope.collectionListingDropdown.collectionAndDataObjectListingEntries[0].description == "Starred from Cloud Browser"){
+                $scope.listVirtualCollections();
+                $scope.$broadcast('scroll.refreshComplete');
+            }else{
+                var path = $scope.collectionListingDropdown.collectionAndDataObjectListingEntries[0].parentPath;
+                $log.info("current path is "+path);
+                $scope.goSubCol(path);
+                $scope.$broadcast('scroll.refreshComplete');
+            }
+        }
     }
 
     $scope.openUpload = function(){
@@ -134,6 +189,7 @@ angular.module('app.controllers', [])
     	$log.info(object);
 		$state.go('menu.profile');
 		$scope.$broadcast('goProfile', object);
+        $scope.$apply();
     }
 
 
@@ -151,7 +207,7 @@ angular.module('app.controllers', [])
  //*     LOGIN       *
  //*   CONTROLLER    *
  //===================
-.controller('loginCtrl', ['$scope', '$log', '$http', '$location', 'globals', '$state', function($scope, $log, $http, $location, $globals, $state) {
+.controller('loginCtrl', ['$scope', '$rootScope', '$log', '$http', '$location', 'globals', '$state', '$window', '$ionicPopup', 'loginService', function($scope, $rootScope, $log, $http, $location, $globals, $state, $window, $ionicPopup, $loginService) {
 	$scope.host;
 	$scope.port;
 	$scope.zone;
@@ -184,13 +240,30 @@ angular.module('app.controllers', [])
         	$log.info(data);
         	$log.info("successful POST" + data);
         }).then(function(path) {
+            var lclStgHst = $globals.getHost();
+            if(lclStgHst=="null"|lclStgHst==null){
+                var myPopup = $ionicPopup.show({
+                    title: 'Would you like to save your login credentials?',
+                    subTitle: 'You will not have to enter credentials again until cache is cleared by OS. Each time the app is opened, you will be routed home.',
+                    scope: $scope,
+                    buttons: [
+                        { text: 'No', type: 'button-clear button-assertive' },
+                        {
+                            text: '<b>Yes</b>',
+                            type: 'button-clear button-positive',
+                            onTap: function(e) {
+                                $log.info($globals.getHost());
+                                $globals.setLoginVars($scope.host, $scope.port, $scope.zone, $scope.userName, $scope.password, $scope.authType);
+                            }       
+                        }
+                    ]
+                });
+            }
+
         	$state.go('menu.home');
             $log.info("end login success processing");
+            $rootScope.$emit("loggedIn", {});
         });
-
-        ;
-
-
 	}
 
 }])
@@ -208,11 +281,22 @@ angular.module('app.controllers', [])
  //*     Menu        *
  //*   CONTROLLER    *
  //===================
-.controller('menuCtrl',['$scope', '$state', '$log', function($scope, $state, $log){
+.controller('menuCtrl',['$scope', '$state', '$log', '$http', 'globals', '$window', function($scope, $state, $log, $http, $globals, $window){
 	$scope.goHome = function(){
 		$log.info("Going Home");
 		$scope.$broadcast('goHome', 0);
 	}
+
+    $scope.logOut = function(){
+         var promise = $http({
+            method: 'POST',
+            url: $globals.backendUrl('logout')
+        }).then(function () {
+            $globals.logOut();
+            $state.go('login');
+        });
+        return promise;
+    }
 }])
 
 
@@ -230,7 +314,7 @@ angular.module('app.controllers', [])
  //*    Profile      *
  //*   CONTROLLER    *
  //===================   
-.controller('profileCtrl',['$scope', '$state', '$log', 'profileService', '$http', 'globals', function($scope, $state, $log, profileService, $http, $globals){
+.controller('profileCtrl',['$scope', '$state', '$log', 'profileService', '$http', 'globals', '$ionicPopup', function($scope, $state, $log, profileService, $http, $globals, $ionicPopup){
 
 	$scope.getFormattedPath = function(normURL){
 		var URL = normURL.replace("/","%2F");
@@ -277,6 +361,164 @@ angular.module('app.controllers', [])
 		return url;
 	}
 
+    $scope.updateProfile = function(){
+        var udPath = $scope.getFormattedPath($scope.profileObject.domainObject.absolutePath);
+        $scope.getProfileObj(udPath);
+    }
+
+    $scope.doRefresh = function(){
+        $log.info("refreshing");
+        $scope.updateProfile();
+        $scope.$broadcast('scroll.refreshComplete');
+    }
+
+
+    $scope.metadata_add_action = function(){
+        var new_Attr = document.getElementById('new_metadata_attribute').value;
+        var new_Val = document.getElementById('new_metadata_value').value;
+        var new_Unit = document.getElementById('new_metadata_unit').value;
+
+        $log.info("adding md");
+        var data_path = $scope.profileObject.domainObject.absolutePath;
+
+        $http({
+            method: 'PUT',
+            url: $globals.backendUrl('metadata'),
+            params: {
+                irodsAbsolutePath: data_path, 
+                attribute: new_Attr, 
+                value: new_Val, 
+                unit: new_Unit
+            }
+        }).then(function (response) {
+            // The then function here is an opportunity to modify the response
+            $log.info(response);
+            // The return value gets picked up by the then in the controller.
+            // return response.data;
+        });
+
+        $log.info("md added");
+        var new_Attr = document.getElementById('new_metadata_attribute').value = "";
+        var new_Val = document.getElementById('new_metadata_value').value = "";
+        var new_Unit = document.getElementById('new_metadata_unit').value = "";
+        $scope.doRefresh();
+    }
+
+    $scope.metadata_delete_action = function(attribute, value, unit){
+        var data_path = $scope.profileObject.domainObject.absolutePath;
+
+        $http({
+            method: 'DELETE',
+            url: $globals.backendUrl('metadata'),
+            params: {
+                irodsAbsolutePath: data_path, 
+                attribute: attribute, 
+                value: value, 
+                unit: unit
+            }
+        }).then(function (response) {
+            // The then function here is an opportunity to modify the response
+            $log.info(response);
+            $scope.doRefresh();
+        });
+    }
+
+    $scope.shouldShowImg = function(){
+        var fileType = $scope.mimeType;
+        fileType = fileType.substring(0,5)
+        if($scope.profileObject.mimeType == "image"){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    // File Action -- RENAME
+    $scope.renamePopup = function(){
+        $scope.data = {};
+
+        var myPopup = $ionicPopup.show({
+            template: '<input type="text" ng-model="newName" id="newName">',
+            title: 'Rename Object',
+            subTitle: 'Be sure to include file type and keep same type as original',
+            scope: $scope,
+            buttons: [
+                { text: 'Cancel', type: 'button-clear button-positive' },
+                {
+                    text: '<b>Save</b>',
+                    type: 'button-clear button-positive',
+                    onTap: function(e) {
+                        var newName = document.getElementById('newName').value;
+                        $scope.rename_Action(newName);
+                    }       
+                }
+            ]
+        });
+
+        myPopup.then(function(res) {
+            var newName = document.getElementById('newName').value;
+            $log.info("Button tapped. New name is " +newName);
+            $log.info("New path is "+$scope.newPath);
+            setTimeout(function() {
+                var newFormatPath = $scope.getFormattedPath($scope.newPath)
+                $scope.getProfileObj(newFormatPath);
+            }, 750);
+        });
+    }
+
+    $scope.newPath;
+
+    $scope.rename_Action = function(newName){
+        var rename_path = $scope.profileObject.parentPath + "/" + $scope.profileObject.childName;
+        var new_name = newName;
+        $scope.newPath = $scope.profileObject.parentPath + "/" + newName;
+
+        $log.info('Renaming:'+rename_path);
+        return $http({
+            method: 'PUT',
+            url: $globals.backendUrl('rename'),
+            params: {
+                path: rename_path, 
+                newName: new_name
+            }
+        }).success(function (data) {
+        })
+    }
+
+    // File Action -- DELETE
+    $scope.deletePopup = function(){
+
+        var myPopup = $ionicPopup.show({
+            title: 'Confirm Delete',
+            subTitle: 'Are you sure you want to delete this object?',
+            scope: $scope,
+            buttons: [
+                { text: 'Cancel', type: 'button-clear button-positive' },
+                {
+                    text: '<b>Delete</b>',
+                    type: 'button-clear button-assertive',
+                    onTap: function(e) {
+                        $log.info("DLT button clicked");
+                        $scope.delete_Action()
+                    }       
+                }
+            ]
+        });
+    }
+
+    $scope.delete_Action = function(){
+        var delete_paths = $scope.profileObject.domainObject.absolutePath;
+            $log.info('Deleting:'+delete_paths);
+            return $http({
+                method: 'DELETE',
+                url: $globals.backendUrl('file'),
+                params: {
+                    path : delete_paths
+                }
+            }).then(function (data) {
+                window.history.back();
+            })
+    }
 
 }])
  

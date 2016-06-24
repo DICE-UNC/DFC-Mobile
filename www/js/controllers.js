@@ -5,7 +5,7 @@ angular.module('app.controllers', [])
  //*      HOME       *
  //*   CONTROLLER    *
  //=================== 
-.controller('homeCtrl', ['$scope', '$rootScope', '$log', '$http', 'globals', '$state', 'Upload', 'profileService', '$ionicPopup', function($scope, $rootScope, $log, $http, $globals, $state, Upload, profileService, $ionicPopup) {
+.controller('homeCtrl', ['$scope', '$rootScope', '$log', '$http', 'globals', '$state', 'Upload', 'profileService', '$ionicPopup', '$window', 'loginService', function($scope, $rootScope, $log, $http, $globals, $state, Upload, profileService, $ionicPopup, $window, $loginService) {
 	$scope.collectionListingDropdown;
 
 	$scope.$on('goHome', function(event, args) {
@@ -32,15 +32,51 @@ angular.module('app.controllers', [])
         }).success(function (data) {
         	$log.info("Setting starred collection as view");
             $scope.collectionListingDropdown = data;
-            $log.info("Set");
-            $log.info(data);
             $log.info($scope.collectionListingDropdown);
         }).error(function () {
-        	$state.go('login');
-        	$scope.plsLogInAlt();
+
+
+            $state.go('login');
+            $scope.plsLogInAlt();
             $scope.collectionListingDropdown = [];
+
+
+            var localStg = $globals.getHost();
+            $log.info("localStorage host is:"+localStg);
+            if(localStg!="null"|localStg!=null){
+                $log.info("Host localStorage is read as not null");
+                $scope.autoLogin();
+            }else{
+                $state.go('login');
+                $scope.plsLogInAlt();
+                $scope.collectionListingDropdown = [];
+            }
         });
     };
+
+    $scope.autoLogin = function(){
+        $log.info("autologin detected");
+        var actval = {
+            host: $globals.getHost(),
+            port: $globals.getPort(),
+            zone: $globals.getZone(),
+            userName: $globals.getUN(),
+            password: $globals.getPW(),
+            authType: $globals.getAuth(),
+            resource: ""
+        }
+
+        $log.info("autlogin creds are:" + actval);
+
+        $http({
+            method: 'POST',
+            url: $globals.backendUrl('login/'),
+            data: actval,
+            headers: { 'Content-Type': 'application/json' }  // set the headers so angular passing info as request payload
+        }).then(function(data){
+            $scope.listVirtualCollections();
+        });
+    }
 
    	$scope.plsLogInAlt = function() {
 	   var alertPopup = $ionicPopup.alert({
@@ -175,7 +211,7 @@ angular.module('app.controllers', [])
  //*     LOGIN       *
  //*   CONTROLLER    *
  //===================
-.controller('loginCtrl', ['$scope', '$rootScope', '$log', '$http', '$location', 'globals', '$state', function($scope, $rootScope, $log, $http, $location, $globals, $state) {
+.controller('loginCtrl', ['$scope', '$rootScope', '$log', '$http', '$location', 'globals', '$state', '$window', '$ionicPopup', 'loginService', function($scope, $rootScope, $log, $http, $location, $globals, $state, $window, $ionicPopup, $loginService) {
 	$scope.host;
 	$scope.port;
 	$scope.zone;
@@ -208,6 +244,26 @@ angular.module('app.controllers', [])
         	$log.info(data);
         	$log.info("successful POST" + data);
         }).then(function(path) {
+            var lclStgHst = $globals.getHost();
+            if(lclStgHst=="null"|lclStgHst==null){
+                var myPopup = $ionicPopup.show({
+                    title: 'Would you like to save your login credentials?',
+                    subTitle: 'You will not have to enter credentials again until cache is cleared by OS. Each time the app is opened, you will be routed home.',
+                    scope: $scope,
+                    buttons: [
+                        { text: 'No', type: 'button-clear button-assertive' },
+                        {
+                            text: '<b>Yes</b>',
+                            type: 'button-clear button-positive',
+                            onTap: function(e) {
+                                $log.info($globals.getHost());
+                                $globals.setLoginVars($scope.host, $scope.port, $scope.zone, $scope.userName, $scope.password, $scope.authType);
+                            }       
+                        }
+                    ]
+                });
+            }
+
         	$state.go('menu.home');
             $log.info("end login success processing");
             $rootScope.$emit("loggedIn", {});
@@ -229,11 +285,22 @@ angular.module('app.controllers', [])
  //*     Menu        *
  //*   CONTROLLER    *
  //===================
-.controller('menuCtrl',['$scope', '$state', '$log', function($scope, $state, $log){
+.controller('menuCtrl',['$scope', '$state', '$log', '$http', 'globals', '$window', function($scope, $state, $log, $http, $globals, $window){
 	$scope.goHome = function(){
 		$log.info("Going Home");
 		$scope.$broadcast('goHome', 0);
 	}
+
+    $scope.logOut = function(){
+         var promise = $http({
+            method: 'POST',
+            url: $globals.backendUrl('logout')
+        }).then(function () {
+            $globals.logOut();
+            $state.go('login');
+        });
+        return promise;
+    }
 }])
 
 

@@ -2,7 +2,7 @@ angular.module('app.services', [])
 
 
 
-.factory('globals',['$rootScope', '$log', '$location', '$injector', function ($rootScope, $log, $location,  $injector) {
+.factory('globals',['$rootScope', '$log', '$location', '$injector', '$window', function ($rootScope, $log, $location,  $injector, $window) {
 
         var f = {};
 
@@ -65,6 +65,48 @@ angular.module('app.services', [])
             this.loggedInIdentity = inputIdentity;
         }
 
+        f.setLoginVars = function(host, port, zone, userName, password, authType){
+            $window.localStorage.setItem("host",host);
+            $window.localStorage.setItem("port",port);
+            $window.localStorage.setItem("zone",zone);
+            $window.localStorage.setItem("userName",userName);
+            $window.localStorage.setItem("password",password);
+            $window.localStorage.setItem("authType",authType);
+        }
+
+        f.getHost = function(){
+            return $window.localStorage.getItem("host");
+        }
+
+        f.getPort = function(){
+            return $window.localStorage.getItem("port");
+        }
+
+        f.getZone = function(){
+            return $window.localStorage.getItem("zone");
+        }
+
+        f.getUN = function(){
+            return $window.localStorage.getItem("userName");
+        }
+
+        f.getPW = function(){
+            return $window.localStorage.getItem("password");
+        }
+
+        f.getAuth = function(){
+            return $window.localStorage.getItem("authType");
+        }
+
+        f.logOut = function(){
+            $window.localStorage.setItem("host",null);
+            $window.localStorage.setItem("port",null);
+            $window.localStorage.setItem("zone",null);
+            $window.localStorage.setItem("userName",null);
+            $window.localStorage.setItem("password",null);
+            $window.localStorage.setItem("authType",null);
+        }
+
         return f;
 
 }])
@@ -122,7 +164,7 @@ angular.module('app.services', [])
         };
 }])
 
-.factory('virtualCollectionsService', ['$http', '$log', 'globals', function ($http, $log, globals) {
+.factory('virtualCollectionsService', ['$http', '$log', 'globals','$window', function ($http, $log, globals, $window) {
         var virtualCollections = [];
         var virtualCollectionContents = [];
         var selectedVirtualCollection = {};
@@ -165,6 +207,61 @@ angular.module('app.services', [])
 
 
 
+}])
+
+.service('loginService', ['$window', function($window){
+    var loginService = [];
+
+
+        var setStarredColData = function(){
+            return $http({
+                method: 'GET', 
+                url: $globals.backendUrl('collection/Starred%20Files?offset=0&path=')
+            }).success(function (data) {
+                loginService = data;
+            });
+        }
+
+        var getStarredColData = function(){
+            return loginService;
+        }
+
+
+        var setLoginVars = function(host, port, zone, userName, password, authType){
+            $window.localStorage.setItem("host",host);
+            $window.localStorage.setItem("port",port);
+            $window.localStorage.setItem("zone",zone);
+            $window.localStorage.setItem("userName",userName);
+            $window.localStorage.setItem("password",password);
+            $window.localStorage.setItem("authType",authType);
+        }
+
+        var getHost = function(){
+            return $window.localStorage.getItem("host");
+        }
+
+        var getPort = function(){
+            return $window.localStorage.getItem("port");
+        }
+
+        var getZone = function(){
+            return $window.localStorage.getItem("zone");
+        }
+
+        var getUN = function(){
+            return $window.localStorage.getItem("userName");
+        }
+
+        var getPW = function(){
+            return $window.localStorage.getItem("password");
+        }
+
+        var getAuth = function(){
+            return $window.localStorage.getItem("authType");
+        }
+    
+
+    
 }])
 
 .service('profileService', [ function(){
