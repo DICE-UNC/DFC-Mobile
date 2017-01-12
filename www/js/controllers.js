@@ -8,10 +8,21 @@ angular.module('app.controllers', [])
 .controller('homeCtrl', ['$scope', '$rootScope', '$log', '$http', 'globals', '$state', 'Upload', 'profileService', '$ionicPopup', '$window', 'loginService', function($scope, $rootScope, $log, $http, $globals, $state, Upload, profileService, $ionicPopup, $window, $loginService) {
 	$scope.collectionListingDropdown;
 
-	$scope.$on('goHome', function(event, args) {
+	$rootScope.$on('goHome', function(event, args) {
         $log.info("goHome broadcast recvd");
-		$scope.listVirtualCollections();
+        if(args==0){
+            $scope.listVirtualCollections();
+        }else{
+            $log.info("RECIEVED: "+args.description);
+            var vcPath = args.uniqueName;
+            $scope.goVC(vcPath);
+        }	
 	});
+
+    $scope.$on('goHomeFromQuery', function(event, args) {
+        $log.info("RECIEVED query#: "+args.description);
+        $scope.goVC(args);        
+    });
 
     $rootScope.$on("loggedIn", function(){
         $scope.landing();
@@ -89,24 +100,21 @@ angular.module('app.controllers', [])
         if($scope.collectionListingDropdown == ""){
             return "Starred Collection";
         }
-    	if($scope.collectionListingDropdown.collectionAndDataObjectListingEntries[0].description == "Starred from Cloud Browser"){
-    		document.getElementById("searchTerm").style.width = "100%";
-    		// $('#searchTerm').css('width', '100%');
-    		return "Starred Collection";
-    	}else{
-    		document.getElementById("searchTerm").style.width = "60%";
-    		document.getElementById("backBtn").style.display = "inline";
+        if($scope.collectionListingDropdown.collectionAndDataObjectListingEntries[0].description == "Starred from Cloud Browser"){
+            document.getElementById("searchTerm").style.width = "100%";
+            return "Starred Collection";
+        }else{
+            document.getElementById("searchTerm").style.width = "60%";
+            document.getElementById("backBtn").style.display = "inline";
 
-    		var path = $scope.collectionListingDropdown.collectionAndDataObjectListingEntries[0].parentPath;
-    		var splt = path.split("/");
-    		var colName = splt[splt.length - 1];
-    		return colName;
-    	}
+            var path = $scope.collectionListingDropdown.collectionAndDataObjectListingEntries[0].parentPath;
+            var splt = path.split("/");
+            var colName = splt[splt.length - 1];
+            return colName;
+        }
     } 
 
     $scope.prevData = [];
-
-    // $scope.breadCrumb = [];
 
     $scope.goSubCol = function(path){
     	$log.info("getting "+path+" collection");
@@ -118,29 +126,39 @@ angular.module('app.controllers', [])
         	method: 'GET', 
         	url: url
         }).success(function (data) {
+            $log.info("Subcol data: ");
+            $log.info(data);
             $scope.collectionListingDropdown = data;
         }).error(function () {
             $scope.collectionListingDropdown = [];
         });
     }
 
-    $scope.goBack = function(){
-    	$scope.collectionListingDropdown = $scope.prevData[$scope.prevData.length - 1];
-    	$scope.prevData.pop();
+    $scope.goVC = function(path){
+        $log.info("getting "+path+" VC");
+        var url = $globals.virtCollectionURL(path);
+        $scope.isVC = true;
+        
+        return $http({
+            method: 'GET', 
+            url: url
+        }).success(function (data) {
+            $log.info("SUCCESS VC GET. Data: ");
+            $log.info(data);
+            $scope.collectionListingDropdown = data;
+        }).error(function () {
+            $log.info("FAIL VC GET");
+            $scope.collectionListingDropdown = [];
+        });
     }
 
-    // $scope.breadCrumbGo = function(crumb){
-    // 	var pathLength = $scope.breadCrumb.length;
-    // 	for(i=0; i<pathLength; i++){
-    // 		if($scope.breadCrumb[i] == crumb){
-    // 			$scope.collectionListingDropdown = $scope.prevData[i];
-    // 			$scope.prevData.slice(0,i-1);
-    // 			$scope.breadCrumb.slice(0,i);
-    // 			$log.info("clicked on "+i+"th item");
-    // 			$log.info("Current BC is "+$scope.breadCrumb);
-    // 		}
-    // 	}
-    // }
+    $scope.goBack = function(){
+    	// $scope.collectionListingDropdown = $scope.prevData[$scope.prevData.length - 1];
+        var parPath = $scope.collectionListingDropdown.collectionAndDataObjectListingEntries[0].parentPath;
+        var res = parPath.split("");
+        $scope.goSubCol(parPath);
+    	// $scope.prevData.pop();
+    }
 
     $scope.doRefresh = function(){
     	$log.info("refreshing");
@@ -285,11 +303,29 @@ angular.module('app.controllers', [])
  //*     Menu        *
  //*   CONTROLLER    *
  //===================
-.controller('menuCtrl',['$scope', '$state', '$log', '$http', 'globals', '$window', function($scope, $state, $log, $http, $globals, $window){
+.controller('menuCtrl',['$scope', '$state', '$log', '$http', 'globals', '$window', '$rootScope', function($scope, $state, $log, $http, $globals, $window, $rootScope){
 	$scope.goHome = function(){
 		$log.info("Going Home");
-		$scope.$broadcast('goHome', 0);
+		$rootScope.$broadcast('goHome', 0);
 	}
+
+    $scope.goVC = function(vc){
+        $log.info("Going to query: "+vc.description);
+        setTimeout(function(){
+            $rootScope.$broadcast('goHome', vc);
+        }, 200);
+        
+    }
+
+
+    $scope.listVirtualCollections = function () {
+        $log.info("getting virtual colls");
+        return $http({method: 'GET', url: $globals.backendUrl('virtualCollection')}).success(function (data) {
+            $rootScope.virtualCollections = data;
+        }).error(function () {
+            $rootScope.virtualCollections = [];
+        });
+    };
 
     $scope.logOut = function(){
          var promise = $http({
@@ -307,6 +343,107 @@ angular.module('app.controllers', [])
 
 
 
+
+
+
+ //===================
+ //*     Search      *
+ //*   CONTROLLER    *
+ //===================
+ .controller('searchCtrl',['$scope', '$location', '$http', 'globals', '$log', '$rootScope', function($scope, $location, $http, $globals, $log, $rootScope){
+    $scope.url_query_name = uuid.v1();
+    $scope.display_name = "";
+    $scope.attr_names = "";
+    $scope.attr_vals  = "";
+    $scope.attr_evals = "EQUAL";
+    
+    $scope.querySearch = function(){
+        $log.info("Performing search POST");
+        $log.info($scope.url_query_name);
+        var query_val = '{"targetZone":"","queryType":"'+ 'BOTH' +'","pathHint":"'+'","metadataQueryElements":[';
+        query_val += '{"attributeName":"'+$scope.attr_names+'","operator":"'+$scope.attr_evals+'","attributeValue":["'+$scope.attr_vals+'"],"connector":"AND"},]}';
+        return $http({
+            method: 'POST',
+            url: $globals.backendUrl('metadataQuery'),
+            data: query_val,
+            dataType: "json",
+            params:{uniqueName:$scope.url_query_name, description:$scope.display_name}
+        }).success(function (data) {
+            $log.info("success search POST");
+            
+            setTimeout(function(){
+                $rootScope.$broadcast('goHomeFromQuery', $scope.url_query_name);
+            }, 0);
+            
+        }) 
+    }
+                    
+ }])
+
+
+
+
+
+ //===================
+ //*       VC        *
+ //*   CONTROLLER    *
+ //===================  
+.controller('vcCtrl',['$scope', '$location', '$http', 'globals', '$log', '$rootScope', function($scope, $location, $http, $globals, $log, $rootScope){
+
+    $rootScope.virtualCollections;
+
+    $scope.listVirtualCollections = function () {
+        $log.info("getting virtual colls");
+        return $http({method: 'GET', url: $globals.backendUrl('virtualCollection')}).success(function (data) {
+            $rootScope.virtualCollections = data;
+        }).error(function () {
+            $rootScope.virtualCollections = [];
+        });
+    };
+
+    $scope.querySearchText = {};
+    $scope.querySearchText.edited;
+    $scope.querySearch = function(){
+        var filter = $scope.querySearchText.edited.toUpperCase();
+        var list = document.getElementById("queryList");
+        var insideDiv = list.getElementsByClassName('queryItem');
+
+
+        for (i = 0; i<insideDiv.length; i++) {
+            var a = insideDiv[i].getElementsByClassName("queryItemName")[0].innerHTML.toUpperCase();
+            if (a.indexOf(filter) > -1) {
+                insideDiv[i].style.display = "";
+            } else {
+                insideDiv[i].style.display = "none";
+            }
+        }
+    };
+
+    $scope.goVC = function(vc){
+        $log.info("Going to query: "+vc.description);
+        setTimeout(function(){
+            $rootScope.$broadcast('goHome', vc);
+        }, 200);
+        
+    }
+
+    $scope.queryDelete = function(vc){
+        $log.info("Deleting query");
+        return $http({
+            method: 'DELETE',
+            url: $globals.backendUrl('virtualCollection' + "/" + encodeURI(vc.uniqueName)),
+            params: {
+
+            }
+        }).then(function (data) {
+            $log.info("Deletion completed!");
+            setTimeout(function(){
+                $scope.listVirtualCollections();
+            }, 200);
+        })
+    }
+                    
+ }])
 
 
 

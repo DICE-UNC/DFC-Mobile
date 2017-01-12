@@ -1,0 +1,18 @@
+<ion-view title="Virtual Collections" id="page7" class=" " ng-init="listVirtualCollections()">
+	<ion-content>
+		<input type="text" id="querySearch" placeholder="Search"
+               class="search_box" ngKeyup="{{querySearch();}}" ng-model="querySearchText.edited"/>
+
+
+        <div id="queryList">
+			<div class="card queryItem" ng-repeat="vc in virtualCollections.userRecentQueries" >
+				<div class="item item-text-wrap">
+					<a ui-sref="menu.home" ng-click="goVC(vc)" class="queryItemName">{{vc.description}}</a>
+					<button ng-click="queryDelete(vc)" class="button button-small button-assertive vcDelBut">
+						Delete
+					</button>
+				</div>
+			</div>
+		</div>
+	</ion-content>
+</ion-view>

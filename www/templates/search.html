@@ -1,0 +1,61 @@
+<ion-view title="New Query" id="page6" class=" ">
+
+	<ion-content>
+
+
+		<table id="queryTable">
+			<tr>
+				<td colspan="3">
+					<label class="item item-input " id="login-input3">
+		                <span class="input-label">Query Name</span>
+		                <input ng-model="$parent.display_name" [ng-pattern="string"] type="text" placeholder="Display Name">
+            		</label>
+				</td>
+			</tr>
+			<tr>
+				<td class="inputTd">
+					<label for="queryAtt" class="queryLabel">
+						<span class="input-label">Attribute Name</span>
+						<input class="queryInput" id="queryAtt" ng-model="$parent.attr_names" [ng-pattern="string"] type="text" placeholder="Name">
+					</label>
+				</td>
+				<td id="equality">
+					<select ng-model="$parent.attr_evals">
+						<option selected value="EQUAL">=</option>
+						<option value="NOT_EQUAL">!=</option>
+						<option value="GREATER_THAN">></option>
+						<option value="LESS_THAN"><</option>
+						<option value="GREATER_THAN_OR_EQUAL_TO">>=</option>
+						<option value="GREATER_THAN_OR_EQUAL_TO"><=</option>
+						<option value="LIKE">Like</option>
+						<option value="BETWEEN">Between</option>
+						<option value="IN">In</option>
+						<option value="NUMERIC_EQUAL">Numeric =</option>
+						<option value="NUMERIC_GREATER_THAN">Numeric ></option>
+						<option value="NUMERIC_LESS_THAN">Numeric <</option>
+						<option value="NUMERIC_GREATER_THAN_OR_EQUAL_TO">Numeric >=</option>
+						<option value="NUMERIC_LESS_THAN_OR_EQUAL_TO">Numeric <=</option>
+					</select>
+				</td>
+				<td class="inputTd">
+					<label for="queryVal" class="queryLabel">
+		                <span class="input-label">Attribute Value</span>
+		                <input class="queryInput" id="queryVal" ng-model="$parent.attr_vals" [ng-pattern="string"] type="text" placeholder="Value">
+            		</label>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="3" id="submitTd">
+					<button class="button button-block button-positive" ng-click="querySearch()" ui-sref="menu.home">
+					  Submit Query
+					</button>
+				</td>
+			</tr>
+		</table>
+	
+			
+		
+		
+	</ion-content>
+
+</ion-view>

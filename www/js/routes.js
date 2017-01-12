@@ -57,6 +57,26 @@ angular.module('app.routes', [])
     controller: 'loginCtrl'
   })
 
+  .state('menu.search', {
+    url: '/page6',
+    views: {
+      'side-menu21': {
+        templateUrl: 'templates/search.html',
+        controller: 'searchCtrl'
+      }
+    }
+  })
+
+  .state('menu.vc', {
+    url: '/page7',
+    views: {
+      'side-menu21': {
+        templateUrl: 'templates/vc.html',
+        controller: 'vcCtrl'
+      }
+    }
+  })  
+
   .state('menu.profile', {
     url: '/page5',
     views: {
@@ -66,6 +86,12 @@ angular.module('app.routes', [])
       }
     }
   })
+
+  // .state('menu.search', {
+  //   url: '/page6'.
+  //   templateUrl: 'templates/search.html',
+  //   controller: 'searchCtrl'
+  // })
 
 $urlRouterProvider.otherwise('/side-menu21/page1')
 

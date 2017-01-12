@@ -4,6 +4,17 @@ angular.module('app.services', [])
 
 .factory('globals',['$rootScope', '$log', '$location', '$injector', '$window', function ($rootScope, $log, $location,  $injector, $window) {
 
+        $rootScope.selectSearchView = function (query_name) {
+          if (!query_name){
+            var query_id = uuid.v1();
+            $log.info("going to Dashboard View");            
+            $location.url("/search/?query_id="+query_id);
+          }else{
+            $log.info("going to Dashboard View");            
+            $location.url("/search/?query_id="+query_name);
+          }
+        };
+
         var f = {};
 
         /*
@@ -21,6 +32,10 @@ angular.module('app.services', [])
         f.subCollectionURL = function(normURL){
             var URL = normURL.replace("/","%2F");
             return "http://dfcweb.datafed.org:8080/irods-cloud-backend/collection/Starred%20Files?offset=0&path="+URL;
+        }
+
+        f.virtCollectionURL = function(vcID){
+            return "http://dfcweb.datafed.org:8080/irods-cloud-backend/collection/"+vcID+"?offset=0&path=";
         }
 
         /**
