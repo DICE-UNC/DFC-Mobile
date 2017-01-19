@@ -9,7 +9,7 @@
             <input type="text" id="searchTerm" placeholder="Search"
                class="search_box" onkeyup="doSearch()" ng-model="searchText"/>
         </div>
-        <ion-content padding="true" class="has-subheader">
+        <ion-content padding="true" class="has-subheader has-footer">
             <ion-refresher
                 pulling-text="Pull to refresh..."
                 on-refresh="doRefresh()">
@@ -31,22 +31,28 @@
 
             </ion-list>
 
-
-
-<!--             <div>
-
-                <a ng-repeat="crumb in breadCrumb" ng-click="breadCrumbGo(crumb)">{{crumb}} > </a>
-                <a>{{currentCollection()}}</a>
-            </div> -->
-
-            
-            
+        
 
         </ion-content>
 
+
+        <!-- Optional Footer -->
+            <ion-footer-bar ng-show="isVC||cd" align-title="left" class="bar-positive">
+              <div class="buttons vcButtons" ng-show="isVC">
+                <i ng-click="vcDelete()" ui-sref="menu.home" class="icon ion-ios-trash button vcFooterButton"></i>
+              </div>
+
+              <div class="buttons vcButtons" ng-show="cd">
+                <button class="button button-outline button-light cdButton" ng-click="searchDir()" ui-sref="menu.search">Search this Directory</button>
+              </div>
+
+            </ion-footer-bar>
+
             <div>Outside of content</div>
 
-            <label ng-show="currentCollection()!='Starred Collection'" for="file-upload" onchange="angular.element(this).scope().openUpload()">
+
+
+            <label ng-hide="isVC||currentCollection()=='Starred Collection'" for="file-upload" onchange="angular.element(this).scope().openUpload()" class="uploadLabel">
                 <i class="icon ion-ios-plus uploadButton"></i>
                 <input id="file-upload" type="file" name="file-upload" />
             </label>

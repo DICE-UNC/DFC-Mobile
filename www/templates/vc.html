@@ -1,5 +1,10 @@
 <ion-view title="Virtual Collections" id="page7" class=" " ng-init="listVirtualCollections()">
 	<ion-content>
+
+		<ion-refresher
+            pulling-text="Pull to refresh..."
+            on-refresh="doRefresh()">
+        </ion-refresher>
 		<input type="text" id="querySearch" placeholder="Search"
                class="search_box" ngKeyup="{{querySearch();}}" ng-model="querySearchText.edited"/>
 
@@ -14,5 +19,6 @@
 				</div>
 			</div>
 		</div>
+		
 	</ion-content>
 </ion-view>

@@ -46,6 +46,14 @@
 			</tr>
 			<tr>
 				<td colspan="3" id="submitTd">
+					<div id="searchButDet">Seaching over: {{searchDir}} <div ng-show="searchDir == ''">(Leave blank to search everything)</div></div>
+					<button class="button button-block button" color="light" ng-click="cd()" ui-sref="menu.home">
+					  Choose Directory
+					</button>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="3" id="submitTd">
 					<button class="button button-block button-positive" ng-click="querySearch()" ui-sref="menu.home">
 					  Submit Query
 					</button>

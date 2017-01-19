@@ -60,11 +60,16 @@ input[type="file"] {
 #uploadButtonDiv{
 	position: fixed;
 	bottom: 0;
+	color: #3e82f5;
 }
 
 .uploadButton{
 	transform: translate(-30px, -20px);
 
+}
+
+.uploadLabel{
+	color: #3e82f5;
 }
 
 #metaData{
@@ -194,7 +199,7 @@ input[type="file"] {
 }
 
 .logOutBut{
-	border-top: 1px black solid;
+	border-top: 1px #3e82f5 solid;
 }
 
 .vcDelBut {
@@ -216,4 +221,21 @@ input[type="file"] {
 
 .queryItemName{
 	text-decoration: none;
+}
+
+.vcButtons{
+	display: block;
+	margin: auto;
+}
+
+.vcFooterButton{
+	font-size: 20pt;
+}
+
+.cdButton{
+	font-weight: bold;
+}
+
+#searchButDet{
+	font-size: small;
 }
